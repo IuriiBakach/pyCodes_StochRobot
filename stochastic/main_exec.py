@@ -1,8 +1,10 @@
-from classes_needed import *
-import numpy as np
 import csv
 
-# a comment
+import numpy as np
+
+from classes_needed import *
+
+# a comment to update
 
 # set initial parameters
 robotSpeed = 3
