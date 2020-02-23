@@ -4,7 +4,7 @@ import numpy as np
 
 from classes_needed import *
 
-# a comment need that need to appear in the git repository after update
+# a branch
 
 # set initial parameters
 robotSpeed = 3
