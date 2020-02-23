@@ -1,10 +1,8 @@
+from classes_needed import *
+import numpy as np
 import csv
 
-import numpy as np
-
-from classes_needed import *
-
-# a comment to update
+# a comment need to be imported into the pycharm
 
 # set initial parameters
 robotSpeed = 3
