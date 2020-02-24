@@ -1,8 +1,8 @@
-from scipy.stats import gamma
-from classes_needed import *
 import copy
 import random
 from random import randint
+
+from classes_needed import *
 
 
 def expected_delay(shape, scale, uppertw):
@@ -277,13 +277,13 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     # gives better result than current best
 
     # check if best solution in the candidate list is better than current best:
-        if candidate_list[0][0][1] < best_sol[1]:
+        if candidate_list[0][1] < best_sol[1]:
             # if so, need to update best solution, perhaps use deepcopy
-            best_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
+            best_sol = [candidate_list[0][2], candidate_list[0][1]]
             # update current solution
-            curr_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
-            # update tabu list -> [(cust1, cust2), move]
-            tabu_list.append([candidate_list[0][0][0], candidate_list[0][1]])
+            curr_sol = [candidate_list[0][2], candidate_list[0][1]]
+            # update tabu list -> [(cust1, cust2)]
+            tabu_list.append(candidate_list[0][0])
 
             # update tabu list if it is longer than needed
             # tabu list should also take into account possible repetitions
@@ -291,14 +291,27 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
                 tabu_list.pop(0)
 
             # increment iteration count and set no_impr_iter to 0
-            iteration +=1
+            iteration += 1
             no_impr_iter = 0
+
+        # if current best solution in the candidate list is not better than overall best, following options are possible:
+        # 1) it is not in the tabu list -> update current solution, update tabu list, no_impr_iter+=1
+        # 2) it is in the tabu list -> find the best candidate not in tabu, do the move, update tabu list, no_impr_iter+=1
+
+        # if the best candidate move not in tabu list
+        elif candidate_list[0][1] not in tabu_list:
+            # update current solution
+            curr_sol = [candidate_list[0][2], candidate_list[0][1]]
+            # update tabu list
+            tabu_list.append(candidate_list[0][0])
+            if len(tabu_list) > max_tabu_len:
+                tabu_list.pop(0)
+            # increase no best solution counter by 1
+            no_impr_iter += 1
+
+        # best candidate solution is in the tabu list
         else:
-            # check if the best move is in the tabu list
-            # if not, update current solution, increase no_impr_iter by 1 and iteration by 1
-            # if yes, find the best one not in tabu, and increase all counters
-            # do not forget update tabu list here too
-            do_stuff_here
+    # find the first candidate in the candidate list not tabu.
 
     # empty the candidate list
     candidate_list = []
