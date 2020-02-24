@@ -1,4 +1,8 @@
+from scipy.stats import gamma
 from classes_needed import *
+import copy
+import random
+from random import randint
 
 
 def expected_delay(shape, scale, uppertw):
@@ -73,22 +77,6 @@ def lateness_array(precomputed_distances, customers_in_route, shape, scale):
     for i, elem in enumerate(precomputed_distances[1:], 1):
         lateness[i] = expected_delay(shape * elem, scale, customers_in_route[i].getLateTW())
     return lateness
-
-
-def m13(route1, route2):
-    """
-    This function computes increase in the linear combination of earliness and lateness between before and after
-    a customer is inserted into a certain position in the route
-
-    additional multipliers could be used to emphasize on earliness/lateness
-
-    :param route1: route before the customer is inserted
-    :param route2: route after the customer is inserted
-    :return: the change in the objective function
-    """
-
-    return (route2.total_earliness() - route1.total_earliness()) + (route2.total_lateness() - route1.total_lateness())
-
 
 def one_shift(cust1, cust2, route_plan, distMatr, shape, scale):
     """
@@ -290,9 +278,9 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
             iteration += 1
             no_impr_iter = 0
 
-        # if current best solution in the candidate list is not better than overall best, following options are possible:
+        # if current best solution in the candidate list is not better than best, following options are possible:
         # 1) it is not in the tabu list -> update current solution, update tabu list, no_impr_iter+=1
-        # 2) it is in the tabu list -> find the best candidate not in tabu, do the move, update tabu list, no_impr_iter+=1
+        # 2) it is in the tabu list -> find the best candidate not in tabu, update tabu list, no_impr_iter+=1
 
         # if the best candidate move not in tabu list
         elif candidate_list[0][1] not in tabu_list:
