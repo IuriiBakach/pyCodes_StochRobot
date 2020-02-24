@@ -1,7 +1,3 @@
-import copy
-import random
-from random import randint
-
 from classes_needed import *
 
 
@@ -311,9 +307,18 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
 
         # best candidate solution is in the tabu list
         else:
-    # find the first candidate in the candidate list not tabu.
+            for elem in candidate_list:
+                if elem[0][0] not in tabu_list:
+                    curr_sol = [elem[0][2], elem[0][1]]
+                    # update tabu list
+                    tabu_list.append(elem[0][0])
+                    if len(tabu_list) > max_tabu_len:
+                        tabu_list.pop(0)
+                    # increase no best solution counter by 1
+                    no_impr_iter += 1
 
-    # empty the candidate list
+    # empty the candidate list and increase main iteration counter
     candidate_list = []
+    iteration += 1
 
     return 0
