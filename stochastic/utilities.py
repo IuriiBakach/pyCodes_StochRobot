@@ -162,6 +162,14 @@ def exchange(cust1, cust2, route_plan, distMatr, shape, scale):
     # the next step is to remove those customers from routes, insert into new positions and return resulting routes
     # and obj fcn
 
+    # the problem arises when I remove customers from the same route. Need to keep track of the positions of removed
+    # customers and insert into the proper positions afterwards. I.e. modify the next 4 lines accordingly
+
+    '''
+    seem like loc_cust_one[0] == loc_cust_two[0] remove the one with the higher position first.
+    and place that one with the higher position first into the new position
+    '''
+
     route_plan_copy[loc_cust_one[0]].remove_customer(position_cust_one, distMatr, shape, scale)
     route_plan_copy[loc_cust_two[0]].remove_customer(position_cust_two, distMatr, shape, scale)
 
@@ -228,7 +236,7 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
 
     # start outer main while loop
     while iteration <= max_iter and no_impr_iter <= no_impr_iter_max:
-        while len(candidate_list) <= max_cand_list_len:
+        while len(candidate_list) <= max_cand_list_len:  # this works nicely
             # select vertices randomly
             # here I get the INDEX of the customers I'd like to use in the swap
             random_sample = random.sample(range(1, len(custList) - 1), 2)
@@ -244,13 +252,19 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
 
                 # also need to check if this works after deepcopy!!!
 
-                operation = one_shift(custList[r_cust_one], custList[r_cust_two], listOfRoutes, matrOfDistances, shape,
-                                      scale)
+                operation = one_shift(custList[r_cust_one - 1], custList[r_cust_two - 1], curr_sol[0], matrOfDistances,
+                                      shape, scale)
 
             else:
+
+                x = custList[r_cust_one]
+                y = custList[r_cust_two]
+
+                z = curr_sol[0]
+
                 # perform exchange operation
-                operation = exchange(custList[r_cust_one], custList[r_cust_two], listOfRoutes, matrOfDistances, shape,
-                                     scale)
+                operation = exchange(custList[r_cust_one - 1], custList[r_cust_two - 1], curr_sol[0], matrOfDistances,
+                                     shape, scale)
 
             # I need to add to a candidate list neighborhood and operation id (either 1 or 2)
             candidate_list.append([operation, r_operation])
@@ -258,17 +272,19 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         # now I can take first element of whatever I need
         candidate_list.sort(key=lambda x: x[0][1])
 
-    # at this point I have a full candidate list. Next step is to check for the best elem in the tabu search or
-    # gives better result than current best
+        # at this point I have a full candidate list. Next step is to check for the best elem in the tabu search or
+        # gives better result than current best
 
-    # check if best solution in the candidate list is better than current best:
-        if candidate_list[0][1] < best_sol[1]:
+        # check if best solution in the candidate list is better than current best:
+
+        if candidate_list[0][0][1] < best_sol[1]:
+
             # if so, need to update best solution, perhaps use deepcopy
-            best_sol = [candidate_list[0][2], candidate_list[0][1]]
+            best_sol = [candidate_list[0][0][2], candidate_list[0][1]]
             # update current solution
-            curr_sol = [candidate_list[0][2], candidate_list[0][1]]
+            curr_sol = [candidate_list[0][0][2], candidate_list[0][1]]
             # update tabu list -> [(cust1, cust2)]
-            tabu_list.append(candidate_list[0][0])
+            tabu_list.append(candidate_list[0][0][0])
 
             # update tabu list if it is longer than needed
             # tabu list should also take into account possible repetitions
@@ -283,12 +299,12 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         # 1) it is not in the tabu list -> update current solution, update tabu list, no_impr_iter+=1
         # 2) it is in the tabu list -> find the best candidate not in tabu, update tabu list, no_impr_iter+=1
 
-        # if the best candidate move not in tabu list
-        elif candidate_list[0][1] not in tabu_list:
+        # if the best candidate move not in tabu list, this works nicely
+        elif candidate_list[0][0][0] not in tabu_list:
             # update current solution
-            curr_sol = [candidate_list[0][2], candidate_list[0][1]]
+            curr_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
             # update tabu list
-            tabu_list.append(candidate_list[0][0])
+            tabu_list.append(candidate_list[0][0][0])
             if len(tabu_list) > max_tabu_len:
                 tabu_list.pop(0)
             # increase no best solution counter by 1
@@ -297,18 +313,18 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         # best candidate solution is in the tabu list
         else:
             for elem in candidate_list:
-                if elem[0][0] not in tabu_list:
-                    curr_sol = [elem[0][2], elem[0][1]]
+                if elem[0][0][0] not in tabu_list:
+                    curr_sol = [elem[0][0][2], elem[0][0][1]]
                     # update tabu list
-                    tabu_list.append(elem[0][0])
+                    tabu_list.append(elem[0][0][0])
                     if len(tabu_list) > max_tabu_len:
                         tabu_list.pop(0)
                     # increase no best solution counter by 1
                     no_impr_iter += 1
 
-    # empty the candidate list and increase main iteration counter
-    candidate_list = []
-    iteration += 1
+        # empty the candidate list and increase main iteration counter
+        candidate_list = []
+        iteration += 1
 
     # return the final list of routes and a corresponding objective function
     return best_sol

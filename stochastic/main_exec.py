@@ -4,8 +4,6 @@ import numpy as np
 
 from classes_needed import *
 
-# a branch
-
 # set initial parameters
 robotSpeed = 3
 maxTravelDist = 6
@@ -19,22 +17,12 @@ scalePar = 1
 # a stub for future setofDepots = []
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(2)
+depot.setNumberOfRobots(3)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
 # now I think all time windows should be scaled to 8 am -> 0
-'''
-customer1 = Customer(1, 0.53, 0.67, 485, 545)
-customer2 = Customer(2, 1.17, 1.23, 530, 590)
-customer3 = Customer(3, 0.83, 1.67, 720, 780)
-customer4 = Customer(4, 1.35, 1.83, 640, 700)
-customer5 = Customer(5, 0.13, 0.57, 900, 960)
-customer6 = Customer(6, 1.36, 0.45, 800, 860)
 
-custList = [customer1, customer2, customer3, customer4, customer5, customer6]
-
-'''
 custList = []
 with open('customers.csv', 'r') as file:
     reader = csv.reader(file)
@@ -44,6 +32,9 @@ with open('customers.csv', 'r') as file:
 # create a corresponding RoutePlan based on the number of robots in the depot
 
 routePlan = []
+
+# create a copy of customers for the tabu search
+custList_tabu = copy.deepcopy(custList)
 
 # create a list of routes with the number of empty routes corresponding to the number of robots in the depot
 
@@ -92,9 +83,10 @@ print(routePlan[0])
 
 # After having a list of customers and routes I need to create initial set of routes filed with customers.
 # Step 1: take empty routes. For all customers check all insertion positions based on the measures and insert
-# those customers 1 by 1. I think as the measure of creating initial route I should use m13
+# those customers 1 by 1.
 '''
 # need to replace this while by for indexed over the number of customers in the customer list
+"""
 for i in range(0, len(custList)):
     print(len(custList))
     obj_fun_change = float("inf")
@@ -127,14 +119,31 @@ for i in range(0, len(custList)):
     routePlan[route_to_ins].insert_customer(pos_to_ins, cust_to_ins, distances, shapePar, scalePar)
     # and remove a customer from a list of initial customers
     custList.remove(cust_to_ins)
+"""
 
-"""
-number_cust_assign = 0
-# what I also want to do is to randomly assign customers to routes
-while number_cust_assign < len(custList):
-    # select random route
-    # select random nonassigned customer
-    # assign it to the selected route
-    # incement number_cust_assign
-    dummy = 0
-"""
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[13], distances, shapePar, scalePar)
+
+routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[8], distances, shapePar, scalePar)
+
+routePlan[2].insert_customer(1, custList[14], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[3], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[12], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[7], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[18], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[17], distances, shapePar, scalePar)
+
+# need to run this tabu search
+
+final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)

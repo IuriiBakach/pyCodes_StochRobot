@@ -3,58 +3,76 @@ from utilities import *
 import copy
 import numpy as np
 import csv
-'''
-customer1 = Customer(1, 0.53, 0.67, 485, 545)
-customer2 = Customer(2, 1.17, 1.23, 530, 590)
-customer3 = Customer(3, 0.83, 1.67, 720, 780)
-customer4 = Customer(4, 1.35, 1.83, 640, 700)
-customer5 = Customer(5, 0.13, 0.57, 900, 960)
-customer6 = Customer(6, 1.36, 0.45, 800, 860)
 
-custList = [customer1, customer2, customer3, customer4, customer5, customer6]
+# set initial parameters
+robotSpeed = 3
+maxTravelDist = 6
 
-routePlan = []
+# _____parameters of the gamma distribution
+shapePar = 1
+scalePar = 1
+# create initial data: customers, depots, routes.
+
+# create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
+# a stub for future setofDepots = []
 
 depot = Depot(0, 0, 0)
+depot.setNumberOfRobots(3)
 
-distances = np.zeros((1, len(custList) + 1))
+# create customers. This should be read in form the .csv file but it's ok for now
+# 480 correspond to 8am. 1020 to 5pm
+# now I think all time windows should be scaled to 8 am -> 0
 
-# ________ this returns a vector of distances form a depot to every customer in minutes; not round trip
-for i in range(0, len(custList)):
-    distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord)) * 60
-
-# create a list of routes with the number of empty routes corresponding to the number of robots in the depot
-for elem in range(2):
-    routePlan.append(Route(elem))
-
-routePlan[0].insert_customer(1, customer1, distances, 1, 1)
-routePlan[0].insert_customer(2, customer3, distances, 1, 1)
-routePlan[0].insert_customer(1, customer5, distances, 1, 1)
-
-routePlan[1].insert_customer(1, customer2, distances, 1, 1)
-routePlan[1].insert_customer(2, customer4, distances, 1, 1)
-routePlan[1].insert_customer(1, customer6, distances, 1, 1)
-
-totalObj = 0
-
-for route in routePlan:
-    totalObj += route.total_earliness()
-    totalObj += route.total_lateness()
-#routePlan_toIns = copy.deepcopy(routePlan)
-
-# when I do alg, need to put flags for each different reloc operator to keep track
-
-move, modifiedObj, modifiedRP = exchange(customer1, customer2, routePlan, distances, 1, 1)
-
-#routePlanMod_1, modifiedObj_1= one_shift(customer1, customer2, routePlan_toIns, distances, 1, 1)
-
-print("here")
-'''
-
-customerList = []
+custList = []
 with open('customers.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
-        customerList.append(Customer(int(row[0]), float(row[1]), float(row[2]), int(row[3]), int(row[4])))
+        custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
 
+# create a corresponding RoutePlan based on the number of robots in the depot
 
+routePlan = []
+
+# create a copy of customers for the tabu search
+custList_tabu = copy.deepcopy(custList)
+
+# create a list of routes with the number of empty routes corresponding to the number of robots in the depot
+
+for elem in range(depot.getNumberRobots()):
+    routePlan.append(Route(elem))
+
+# create a matrix of distances from depot(s) to customers
+
+distances = np.zeros((1, len(custList) + 1))
+
+# ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
+# not round trip. robot speed to be removed when corresponding alphas are taken into account
+for i in range(0, len(custList)):
+    distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord)) / robotSpeed
+
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[13], distances, shapePar, scalePar)
+
+routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[8], distances, shapePar, scalePar)
+
+routePlan[2].insert_customer(1, custList[14], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[3], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[12], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[7], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[18], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[17], distances, shapePar, scalePar)
+
+print(routePlan)
+
+final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
