@@ -78,6 +78,7 @@ def lateness_array(precomputed_distances, customers_in_route, shape, scale):
         lateness[i] = expected_delay(shape * elem, scale, customers_in_route[i].getLateTW())
     return lateness
 
+
 def one_shift(cust1, cust2, route_plan, distMatr, shape, scale):
     """
     Execute a 1-shift (vertex reassignment) operator. That is remove first customer form a current route
@@ -309,4 +310,5 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     candidate_list = []
     iteration += 1
 
-    return 0
+    # return the final list of routes and a corresponding objective function
+    return best_sol
