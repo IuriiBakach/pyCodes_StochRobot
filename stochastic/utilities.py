@@ -166,16 +166,13 @@ def exchange(cust1, cust2, route_plan, distMatr, shape, scale):
     # customers and insert into the proper positions afterwards. I.e. modify the next 4 lines accordingly
 
     '''
-    seem like loc_cust_one[0] == loc_cust_two[0] remove the one with the higher position first.
-    and place that one with the higher position first into the new position
+    insert customer 2 after customer 1, remove customer 1; insert customer 1 after customer 2, remove customer 2
     '''
-
-    route_plan_copy[loc_cust_one[0]].remove_customer(position_cust_one, distMatr, shape, scale)
-    route_plan_copy[loc_cust_two[0]].remove_customer(position_cust_two, distMatr, shape, scale)
-
-    # check indexes so that everything works nicely
     route_plan_copy[loc_cust_one[0]].insert_customer(position_cust_one, cust2, distMatr, shape, scale)
+    route_plan_copy[loc_cust_one[0]].remove_customer(position_cust_one + 1, distMatr, shape, scale)
+
     route_plan_copy[loc_cust_two[0]].insert_customer(position_cust_two, cust1, distMatr, shape, scale)
+    route_plan_copy[loc_cust_two[0]].remove_customer(position_cust_two + 1, distMatr, shape, scale)
 
     for route in route_plan_copy:
         total_earl += route.total_earliness()
@@ -199,22 +196,69 @@ def total_obj_fcn_route(routePlan):
     return total_earl + total_late
 
 
+def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, distances, shape, scale):
+    """
+    Create a candidate list of the len = max_cand_list_len for the tabu search
+
+    :param customerList: initial customer list
+    :param currentSolutionRoutes: current solution
+    :param max_cand_list_len: how many candidates to create
+    :param distances: matrix of distacne between customers
+    :param shape: shape
+    :param scale: scale
+    :return: a sorted list of possible moves
+    """
+    candidate_list = []
+
+    while len(candidate_list) < max_cand_list_len:  # this works nicely
+        # select vertices randomly
+        # here I get the INDEX of the customers I'd like to use in the swap
+        random_sample = random.sample(range(0, len(customerList)), 2)
+        r_cust_one = random_sample[0]
+        r_cust_two = random_sample[1]
+
+        # once I selected these indices, I need to randomly chose an operation
+        r_operation = randint(1, 2)
+        if r_operation == 1:
+            # I need to perform a one_shift operation
+            # operation has [(cust1, cust2), obj_fcn, modifiedRoute]
+            # listOfRoutes is the current solution
+
+            # also need to check if this works after deepcopy!!!
+
+            operation = one_shift(customerList[r_cust_one - 1], customerList[r_cust_two - 1], currentSolutionRoutes[0],
+                                  distances, shape, scale)
+
+        else:
+            # perform exchange operation
+            operation = exchange(customerList[r_cust_one - 1], customerList[r_cust_two - 1], currentSolutionRoutes[0],
+                                 distances, shape, scale)
+
+        # I need to add to a candidate list neighborhood and operation id (either 1 or 2)
+        candidate_list.append([operation, r_operation])
+    # Sorted candidate list based on the changed objective function
+    # now I can take first element of whatever I need
+    candidate_list.sort(key=lambda x: x[0][1])
+
+    return candidate_list
+
+
 def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     """
     Main tabu search execution procedure
 
-    :param custList:
-    :param matrOfDistances:
-    :param listOfRoutes:
-    :param shape:
-    :param scale:
-    :return:
+    :param custList: initial list of customers
+    :param matrOfDistances: matrix of distances between all customers
+    :param listOfRoutes: initial list of routes to be modified
+    :param shape: shape parameter
+    :param scale: scale parameter
+    :return: best list of routes and a corresponding objective function
     """
 
     # to begin I need to specify all the required parameters
     max_iter = 100
-    no_impr_iter_max = 10
-    max_cand_list_len = 7
+    no_impr_iter_max = 20
+    max_cand_list_len = 50
     iteration = 0
     no_impr_iter = 0
 
@@ -225,7 +269,7 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     # Do I need it to be a dict?
 
     tabu_list = []
-    max_tabu_len = 5
+    max_tabu_len = 10
 
     # create a candidate list
     candidate_list = []
@@ -236,41 +280,11 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
 
     # start outer main while loop
     while iteration <= max_iter and no_impr_iter <= no_impr_iter_max:
-        while len(candidate_list) <= max_cand_list_len:  # this works nicely
-            # select vertices randomly
-            # here I get the INDEX of the customers I'd like to use in the swap
-            random_sample = random.sample(range(1, len(custList) - 1), 2)
-            r_cust_one = random_sample[0]
-            r_cust_two = random_sample[1]
+        print("curr iter ", iteration)
+        print("no impr ", no_impr_iter)
 
-            # once I selected these indices, I need to randomly chose an operation
-            r_operation = randint(1, 2)
-            if r_operation == 1:
-                # I need to perform a one_shift operation
-                # operation has [(cust1, cust2), obj_fcn, modifiedRoute]
-                # listOfRoutes is the current solution
-
-                # also need to check if this works after deepcopy!!!
-
-                operation = one_shift(custList[r_cust_one - 1], custList[r_cust_two - 1], curr_sol[0], matrOfDistances,
-                                      shape, scale)
-
-            else:
-
-                x = custList[r_cust_one]
-                y = custList[r_cust_two]
-
-                z = curr_sol[0]
-
-                # perform exchange operation
-                operation = exchange(custList[r_cust_one - 1], custList[r_cust_two - 1], curr_sol[0], matrOfDistances,
-                                     shape, scale)
-
-            # I need to add to a candidate list neighborhood and operation id (either 1 or 2)
-            candidate_list.append([operation, r_operation])
-        # Sorted candidate list based on the changed objective function
-        # now I can take first element of whatever I need
-        candidate_list.sort(key=lambda x: x[0][1])
+        # create a candidate list
+        candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shape, scale)
 
         # at this point I have a full candidate list. Next step is to check for the best elem in the tabu search or
         # gives better result than current best
@@ -280,19 +294,22 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         if candidate_list[0][0][1] < best_sol[1]:
 
             # if so, need to update best solution, perhaps use deepcopy
-            best_sol = [candidate_list[0][0][2], candidate_list[0][1]]
+            best_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
             # update current solution
-            curr_sol = [candidate_list[0][0][2], candidate_list[0][1]]
+            curr_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
             # update tabu list -> [(cust1, cust2)]
             tabu_list.append(candidate_list[0][0][0])
+            # also need to append reverse of 2 customers
+            mirror_move = (candidate_list[0][0][0][1], candidate_list[0][0][0][0])
+            tabu_list.append(mirror_move)
 
             # update tabu list if it is longer than needed
             # tabu list should also take into account possible repetitions
             if len(tabu_list) > max_tabu_len:
-                tabu_list.pop(0)
+                tabu_list = tabu_list[2:]
 
             # increment iteration count and set no_impr_iter to 0
-            iteration += 1
+            # iteration += 1
             no_impr_iter = 0
 
         # if current best solution in the candidate list is not better than best, following options are possible:
@@ -305,26 +322,34 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
             curr_sol = [candidate_list[0][0][2], candidate_list[0][0][1]]
             # update tabu list
             tabu_list.append(candidate_list[0][0][0])
+            # also need to append reverse of 2 customers
+            mirror_move = (candidate_list[0][0][0][1], candidate_list[0][0][0][0])
+            tabu_list.append(mirror_move)
+
             if len(tabu_list) > max_tabu_len:
-                tabu_list.pop(0)
+                tabu_list = tabu_list[2:]
             # increase no best solution counter by 1
             no_impr_iter += 1
 
         # best candidate solution is in the tabu list
         else:
             for elem in candidate_list:
-                if elem[0][0][0] not in tabu_list:
-                    curr_sol = [elem[0][0][2], elem[0][0][1]]
+                # elem[0][0] returns a pair of customers
+
+                if elem[0][0] not in tabu_list:
+                    curr_sol = [elem[0][2], elem[0][1]]
                     # update tabu list
-                    tabu_list.append(elem[0][0][0])
+                    tabu_list.append(elem[0][0])
+                    mirror_move = (elem[0][0][1], elem[0][0][0])
+                    tabu_list.append(mirror_move)
                     if len(tabu_list) > max_tabu_len:
-                        tabu_list.pop(0)
+                        tabu_list = tabu_list[2:]
                     # increase no best solution counter by 1
                     no_impr_iter += 1
+                    break
 
         # empty the candidate list and increase main iteration counter
-        candidate_list = []
         iteration += 1
 
     # return the final list of routes and a corresponding objective function
-    return best_sol
+    return [best_sol, iteration, no_impr_iter]

@@ -17,7 +17,7 @@ scalePar = 1
 # a stub for future setofDepots = []
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(3)
+depot.setNumberOfRobots(2)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
@@ -75,4 +75,8 @@ routePlan[2].insert_customer(1, custList[17], distances, shapePar, scalePar)
 
 print(routePlan)
 
-final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+customers, objective, route = exchange(custList[1], custList[2], routePlan, distances, shapePar, scalePar)
+
+print(route)
+
+# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
