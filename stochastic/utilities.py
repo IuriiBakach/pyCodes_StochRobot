@@ -18,14 +18,16 @@ def expected_delay(shape, scale, uppertw):
     :return: expected delay
     """
 
-    # ______ create required gamma distributions
-    gd1 = gamma(shape, 1 / scale)
-    gd2 = gamma(shape + 1, 1 / scale)
+    # ______ create required gamma distributions 3 modify initial creation of the distributions
+    gd1 = gamma(shape)
+    gd2 = gamma(shape + 1)
     ans = shape * scale * (1 - gd2.cdf(uppertw)) - uppertw * (1 - gd1.cdf(uppertw))
+    '''
     if ans < 0:
         return 0.0
     else:
-        return ans
+    '''
+    return ans
 
 
 def expected_earliness(shape, scale, lowertw):
@@ -41,14 +43,16 @@ def expected_earliness(shape, scale, lowertw):
     :return: expected earliness
     """
 
-    gd1 = gamma(shape, 1 / scale)
-    gd2 = gamma(shape + 1, 1 / scale)
+    gd1 = gamma(shape)
+    gd2 = gamma(shape + 1)
 
     ans = lowertw * gd1.cdf(lowertw) - shape * scale * gd2.cdf(lowertw)
+    '''
     if ans < 0:
         return 0.0
     else:
-        return ans
+    '''
+    return ans
 
 
 def earliness_array(precomputed_distances, customers_in_route, shape, scale):
