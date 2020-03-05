@@ -27,6 +27,7 @@ def expected_delay(shape, scale, uppertw):
     else:
         return ans
 
+
 def expected_earliness(shape, scale, lowertw):
     """
         This function computes expected earliness of the arrival of robot r to the customer c taking into account
