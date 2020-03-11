@@ -108,7 +108,9 @@ class Route:
 
         # ______ if initially the route is not empty
         if self.distances[pos - 1] != 0:
-            self.distances[pos] += self.distances[pos - 1] + distMatr[0][self.currentRoute[-2].id]
+            change = self.distances[pos] + 2 * self.distances[pos - 1]
+            self.distances[pos] = change
+            # self.distances[pos] += self.distances[pos - 1] + distMatr[0][self.currentRoute[-2].id]
         else:
             self.distances[pos] += self.distances[pos - 1]
 

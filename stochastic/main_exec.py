@@ -17,7 +17,7 @@ scalePar = 1
 # a stub for future setofDepots = []
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(3)
+depot.setNumberOfRobots(1)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
@@ -122,31 +122,29 @@ for i in range(0, len(custList)):
     custList.remove(cust_to_ins)
 """
 
-routePlan[0].insert_customer(1, custList[14], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[12], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[18], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[7], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
-
-routePlan[1].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[9], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[16], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[7], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-
-routePlan[2].insert_customer(1, custList[19], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[0], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[5], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[11], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[11], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[12], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[13], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[14], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[17], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[18], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
 
 # need to run this tabu search
 
-final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-print(routePlan)
+# print(final_ans[0])

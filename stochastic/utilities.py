@@ -179,6 +179,8 @@ def exchange(cust1, cust2, route_plan, distMatr, shape, scale):
     '''
     insert customer 2 after customer 1, remove customer 1; insert customer 1 after customer 2, remove customer 2
     '''
+
+    # insert customer has an error
     route_plan_copy[loc_cust_one[0]].insert_customer(position_cust_one, cust2, distMatr, shape, scale)
     route_plan_copy[loc_cust_one[0]].remove_customer(position_cust_one + 1, distMatr, shape, scale)
 
