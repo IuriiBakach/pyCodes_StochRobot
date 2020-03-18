@@ -107,8 +107,11 @@ class Route:
         # taking into account roundtrips
 
         # ______ if initially the route is not empty
+
+        # tmp =  self.currentRoute[pos - 1].getId()
+
         if self.distances[pos - 1] != 0:
-            change = self.distances[pos] + 2 * self.distances[pos - 1]
+            change = self.distances[pos] + self.distances[pos - 1] + distMatr[0][self.currentRoute[pos - 1].getId()]
             self.distances[pos] = change
             # self.distances[pos] += self.distances[pos - 1] + distMatr[0][self.currentRoute[-2].id]
         else:
