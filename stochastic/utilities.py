@@ -3,6 +3,38 @@ from classes_needed import *
 import copy
 import random
 from random import randint
+import numpy as np
+
+
+def all_distances(depot_loc, list_of_cust, inner_zone_coords):
+    """
+        Compute the matrix of distances with corresponding number of blocks for each of the 4 possible routes for each
+    customer involved
+
+    :param depot_loc:  a [x,y] set of depot coords [1.2,1.7]
+    :param list_of_cust: a list of customers considered
+    :param inner_zone_coords: array of vertices of the inner zone of this form [xLow, yLow, xUp, yUp] [.3, .6, 1.7, 1.3]
+    :return: the matrix of distances
+    """
+
+    distance_matrix = np.zeros((len(list_of_cust), 4), dtype='f,f').tolist()
+    tmp = []
+
+    # for every customer compute distances
+    for cust in list_of_cust:
+        # if customer falls into case 1, i.e. same upper zone with the depot, need to compute Manh distances and
+        # fill all 4 cells with the same values
+        if cust.getYCoord() > inner_zone_coords[1] and 0 < cust.getXCoord() < inner_zone_coords[0] and \
+                inner_zone_coords[2] < cust.getXCoord() < 2:
+            # compute manhattan distance
+            case_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]), 0)
+            # modify the whole row so that all the distances are the same for 4 possible routes
+            for i in range(0, 4):
+                tmp.append(case_distance)
+            distance_matrix[0] = tmp
+        # if customer falls into case 2, i.e. has coord in the zone, then 4 different paths are possible.
+
+    return distance_matrix
 
 
 def expected_delay(shape, scale, uppertw):

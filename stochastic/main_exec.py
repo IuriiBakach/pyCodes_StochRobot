@@ -8,13 +8,18 @@ from classes_needed import *
 robotSpeed = 3
 maxTravelDist = 6
 
+# Create an initial matrix for shape and scale values for different zones and times
+# col = zone, row = hours
+los_matrix = np.zeros((4, 2), dtype='f,f').tolist()
+# fill it with appropriate values here
+
+
 # _____parameters of the gamma distribution
 shapePar = 2
 scalePar = 1
 # create initial data: customers, depots, routes.
 
 # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
-# a stub for future setofDepots = []
 
 depot = Depot(0, 0, 0)
 depot.setNumberOfRobots(3)
