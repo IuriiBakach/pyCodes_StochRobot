@@ -67,6 +67,17 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
         # if customer falls into case 2, i.e. has coord in the zone, then 4 different paths are possible.
         # the most difficult case, do it here
         else:
+            # step 1: find 4 entry points: direct distances from a customer to a edges and these are inner distances
+            # points: 1-left, 2-down, 3-up, 4-right
+            # a point contain coords and number of blocks inside a zone
+
+            entry_pt_1 = [(inner_zone_coords[0], cust.getYCoord()), abs(inner_zone_coords[0] - cust.getXCoord())]
+            entry_pt_2 = [(cust.getXCoord(), inner_zone_coords[1]), abs(inner_zone_coords[1] - cust.getYCoord())]
+            entry_pt_3 = [(cust.getXCoord(), inner_zone_coords[2]), abs(inner_zone_coords[2] - cust.getYCoord())]
+            entry_pt_4 = [(inner_zone_coords[3], cust.getYCoord()), abs(inner_zone_coords[3] - cust.getXCoord())]
+
+            # step 2: find the distance to all entry points avoiding inner zone
+            # to points 1, 3, 4 it's easy; to point 2 need to use same approach as for the case 3 -> min(A, B)
 
     return distance_matrix
 
