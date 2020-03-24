@@ -21,18 +21,52 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
     tmp = []
 
     # for every customer compute distances
-    for cust in list_of_cust:
+    for index, cust in enumerate(list_of_cust):
         # if customer falls into case 1, i.e. same upper zone with the depot, need to compute Manh distances and
-        # fill all 4 cells with the same values
-        if cust.getYCoord() > inner_zone_coords[1] and 0 < cust.getXCoord() < inner_zone_coords[0] and \
+        # fill all 4 cells with the same values. check this
+        if cust.getYCoord() > inner_zone_coords[1] or 0 < cust.getXCoord() < inner_zone_coords[0] and \
                 inner_zone_coords[2] < cust.getXCoord() < 2:
             # compute manhattan distance
             case_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]), 0)
             # modify the whole row so that all the distances are the same for 4 possible routes
             for i in range(0, 4):
                 tmp.append(case_distance)
+
+                # check distance matrix indices
             distance_matrix[0] = tmp
+            tmp = []
+
+        # if if customer falls into case 3, i.e. is in the lower part of the graph directly below the zone.
+        # in this case we have 2 possible routes:
+        # 1) shortest through the zone
+        # 2) shortest avoiding the zone
+        # other 2 routes should be filled with something (perhaps inf?)
+        if inner_zone_coords[0] < cust.getXCoord() < inner_zone_coords[2] and \
+                0 < cust.getYCoord() < inner_zone_coords[1]:
+            # 1) shortest through the zone, (blocks outside inner zone, blocks inside inner zone)
+            case1_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]) -
+                              (inner_zone_coords[3] + inner_zone_coords[1]),
+                              inner_zone_coords[3] + inner_zone_coords[1])
+            # 2) shortest avoiding the zone
+            case2_distance_a = abs(inner_zone_coords[0] - depot_loc[0]) + abs(inner_zone_coords[1] - depot_loc[1]) + \
+                               abs(inner_zone_coords[0] - cust.getXCoord()) + abs(
+                inner_zone_coords[1] - cust.getYCoord())
+
+            case2_distance_b = abs(inner_zone_coords[2] - depot_loc[0]) + abs(
+                inner_zone_coords[1] - depot_loc[1]) + abs(inner_zone_coords[2] - cust.getXCoord()) + abs(
+                inner_zone_coords[1] - cust.getYCoord())
+
+            # fill the proper row that corresponds to a customer
+            case2_distance = (min(case2_distance_a, case2_distance_b), 0)
+            tmp = [case1_distance, case2_distance, (1000, 1000), (1000, 1000)]
+
+            # check distance matrix indices
+            distance_matrix[0] = tmp
+            tmp = []
+
         # if customer falls into case 2, i.e. has coord in the zone, then 4 different paths are possible.
+        # the most difficult case, do it here
+        else:
 
     return distance_matrix
 
