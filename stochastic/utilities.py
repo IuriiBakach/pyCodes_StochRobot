@@ -33,7 +33,7 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
                 tmp.append(case_distance)
 
                 # check distance matrix indices
-            distance_matrix[0] = tmp
+            distance_matrix[index] = tmp
             tmp = []
 
         # if if customer falls into case 3, i.e. is in the lower part of the graph directly below the zone.
@@ -61,11 +61,10 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             tmp = [case1_distance, case2_distance, (1000, 1000), (1000, 1000)]
 
             # check distance matrix indices
-            distance_matrix[0] = tmp
+            distance_matrix[index] = tmp
             tmp = []
 
         # if customer falls into case 2, i.e. has coord in the zone, then 4 different paths are possible.
-        # the most difficult case, do it here
         else:
             # step 1: find 4 entry points: direct distances from a customer to a edges and these are inner distances
             # points: 1-left, 2-down, 3-up, 4-right
@@ -78,6 +77,15 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
 
             # step 2: find the distance to all entry points avoiding inner zone
             # to points 1, 3, 4 it's easy; to point 2 need to use same approach as for the case 3 -> min(A, B)
+
+            case2_distance_1 = (abs(depot_loc[0] - entry_pt_1[0][0]) +
+                                abs(depot_loc[1] - entry_pt_1[0][1]), entry_pt_1[1])
+            case2_distance_3 = (abs(depot_loc[0] - entry_pt_3[0][0]) +
+                                abs(depot_loc[1] - entry_pt_3[0][1]), entry_pt_3[1])
+            case2_distance_4 = (abs(depot_loc[0] - entry_pt_4[0][0]) +
+                                abs(depot_loc[1] - entry_pt_4[0][1]), entry_pt_4[1])
+
+            case2_distance_2 =
 
     return distance_matrix
 
