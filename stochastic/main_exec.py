@@ -10,7 +10,8 @@ maxTravelDist = 6
 
 # Create an initial matrix for shape and scale values for different zones and times
 # col = zone, row = hours
-los_matrix = np.zeros((4, 2), dtype='f,f').tolist()
+los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
+los_matrix[0] = [(1, 1), (2, 1)]
 # fill it with appropriate values here
 
 
@@ -152,10 +153,10 @@ routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
 
 # need to run this tabu search
 
-earl = routePlan[0].total_earliness() + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+# earl = routePlan[0].total_earliness() + routePlan[1].total_earliness() + routePlan[2].total_earliness()
+# latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
 
-print(earl + latte)
-# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+# print(earl + latte)
+final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-#print(final_ans[0])
+print(final_ans[0])

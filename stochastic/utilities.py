@@ -29,10 +29,9 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             # compute manhattan distance
             case_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]), 0)
             # modify the whole row so that all the distances are the same for 4 possible routes
-            for i in range(0, 4):
-                tmp.append(case_distance)
 
-                # check distance matrix indices
+            tmp = [case_distance, (1000, 1000), (1000, 1000), (1000, 1000)]
+            # check distance matrix indices
             distance_matrix[index] = tmp
             tmp = []
 
@@ -85,12 +84,30 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             case2_distance_4 = (abs(depot_loc[0] - entry_pt_4[0][0]) +
                                 abs(depot_loc[1] - entry_pt_4[0][1]), entry_pt_4[1])
 
-            case2_distance_2 =
+            # left bottom corner and right bottom corner distance
+            case2_distance_2a = abs(depot_loc[0] - inner_zone_coords[0]) + abs(depot_loc[1] - inner_zone_coords[1]) + \
+                                abs(entry_pt_2[0][0] - inner_zone_coords[0])
+            case2_distance_2b = abs(depot_loc[0] - inner_zone_coords[2]) + abs(depot_loc[1] - inner_zone_coords[1]) + \
+                                abs(entry_pt_2[0][0] - inner_zone_coords[2])
+            case2_distance_2 = (min(case2_distance_2a, case2_distance_2b), entry_pt_2[1])
+
+            tmp = [case2_distance_1, case2_distance_2, case2_distance_3, case2_distance_4]
+            distance_matrix[index] = tmp
+            tmp = []
 
     return distance_matrix
 
 
-def expected_delay(shape, scale, uppertw):
+def distance_matrix_reduction(los_matrix, raw_dist_matrix):
+    # for every element in the raw matrix I need to compute resulting travel time. Raw matrix has 2 components:
+    # distance in one zone and distance in another zone. What I need is to multiply those corresponding numbers by shape
+    # parameter and add them together to get the total distance/time. Finally, divide it by the expected speed = 3.
+    # In the end, for every customer find the minimum distance and return a separate list with best route id's for every
+    # customer
+    return 0
+
+
+def expected_delay(shape, scale_par, uppertw):
     """
         This function computes expected delay of the arrival of robot r to the customer c taking into account
     all previously visited customers
@@ -106,7 +123,7 @@ def expected_delay(shape, scale, uppertw):
     # ______ create required gamma distributions 3 modify initial creation of the distributions
     gd1 = gamma(shape)
     gd2 = gamma(shape + 1)
-    ans = shape * scale * (1 - gd2.cdf(uppertw)) - uppertw * (1 - gd1.cdf(uppertw))
+    ans = shape * scale_par * (1 - gd2.cdf(uppertw)) - uppertw * (1 - gd1.cdf(uppertw))
     '''
     if ans < 0:
         return 0.0
@@ -115,7 +132,7 @@ def expected_delay(shape, scale, uppertw):
     return ans
 
 
-def expected_earliness(shape, scale, lowertw):
+def expected_earliness(shape, scale_par, lowertw):
     """
         This function computes expected earliness of the arrival of robot r to the customer c taking into account
     all previously visited customers
@@ -131,7 +148,7 @@ def expected_earliness(shape, scale, lowertw):
     gd1 = gamma(shape)
     gd2 = gamma(shape + 1)
 
-    ans = lowertw * gd1.cdf(lowertw) - shape * scale * gd2.cdf(lowertw)
+    ans = lowertw * gd1.cdf(lowertw) - shape * scale_par * gd2.cdf(lowertw)
     '''
     if ans < 0:
         return 0.0
