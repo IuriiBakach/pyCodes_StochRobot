@@ -113,7 +113,6 @@ class Route:
         if self.distances[pos - 1] != 0:
             change = self.distances[pos] + self.distances[pos - 1] + distMatr[0][self.currentRoute[pos - 1].getId()]
             self.distances[pos] = change
-            # self.distances[pos] += self.distances[pos - 1] + distMatr[0][self.currentRoute[-2].id]
         else:
             self.distances[pos] += self.distances[pos - 1]
 

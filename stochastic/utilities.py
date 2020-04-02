@@ -98,15 +98,6 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
     return distance_matrix
 
 
-def distance_matrix_reduction(los_matrix, raw_dist_matrix):
-    # for every element in the raw matrix I need to compute resulting travel time. Raw matrix has 2 components:
-    # distance in one zone and distance in another zone. What I need is to multiply those corresponding numbers by shape
-    # parameter and add them together to get the total distance/time. Finally, divide it by the expected speed = 3.
-    # In the end, for every customer find the minimum distance and return a separate list with best route id's for every
-    # customer
-    return 0
-
-
 def expected_delay(shape, scale_par, uppertw):
     """
         This function computes expected delay of the arrival of robot r to the customer c taking into account
@@ -124,11 +115,7 @@ def expected_delay(shape, scale_par, uppertw):
     gd1 = gamma(shape)
     gd2 = gamma(shape + 1)
     ans = shape * scale_par * (1 - gd2.cdf(uppertw)) - uppertw * (1 - gd1.cdf(uppertw))
-    '''
-    if ans < 0:
-        return 0.0
-    else:
-    '''
+
     return ans
 
 
@@ -149,11 +136,7 @@ def expected_earliness(shape, scale_par, lowertw):
     gd2 = gamma(shape + 1)
 
     ans = lowertw * gd1.cdf(lowertw) - shape * scale_par * gd2.cdf(lowertw)
-    '''
-    if ans < 0:
-        return 0.0
-    else:
-    '''
+
     return ans
 
 

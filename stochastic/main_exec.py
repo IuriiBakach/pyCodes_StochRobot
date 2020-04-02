@@ -16,7 +16,7 @@ los_matrix[0] = [(1, 1), (2, 1)]
 
 
 # _____parameters of the gamma distribution
-shapePar = 2
+shapePar = 1
 scalePar = 1
 # create initial data: customers, depots, routes.
 
