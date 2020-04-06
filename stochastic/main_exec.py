@@ -30,10 +30,12 @@ depot.setNumberOfRobots(3)
 # now I think all time windows should be scaled to 8 am -> 0
 
 custList = []
-with open('customers.csv', 'r') as file:
+with open('customersTest.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
+
+
 
 # create a corresponding RoutePlan based on the number of robots in the depot
 
@@ -47,14 +49,24 @@ custList_tabu = copy.deepcopy(custList)
 for elem in range(depot.getNumberRobots()):
     routePlan.append(Route(elem))
 
-# create a matrix of distances from depot(s) to customers
+depotCoords = [1.2, 1.7]
+zoneCoords = [.3, .6, 1.7, 1.3]
 
+# create a matrix of distances from depot(s) to customers
+distances = all_distances(depotCoords, custList, zoneCoords)
+
+# for cust in custList:
+print(distances)
+
+'''
 distances = np.zeros((1, len(custList) + 1))
 
 # ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
 # not round trip. robot speed to be removed when corresponding alphas are taken into account
 for i in range(0, len(custList)):
     distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
+
+'''
 
 '''
 print(distances)
@@ -127,6 +139,7 @@ for i in range(0, len(custList)):
     # and remove a customer from a list of initial customers
     custList.remove(cust_to_ins)
 """
+'''
 
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
@@ -160,3 +173,5 @@ routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
 final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
 print(final_ans[0])
+
+'''

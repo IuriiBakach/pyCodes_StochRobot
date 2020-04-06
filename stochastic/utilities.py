@@ -24,10 +24,10 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
     for index, cust in enumerate(list_of_cust):
         # if customer falls into case 1, i.e. same upper zone with the depot, need to compute Manh distances and
         # fill all 4 cells with the same values. check this
-        if cust.getYCoord() > inner_zone_coords[1] or 0 < cust.getXCoord() < inner_zone_coords[0] and \
-                inner_zone_coords[2] < cust.getXCoord() < 2:
+        if cust.yCoord > inner_zone_coords[3] or cust.xCoord < inner_zone_coords[0] or cust.xCoord > inner_zone_coords[
+            2]:
             # compute manhattan distance
-            case_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]), 0)
+            case_distance = (abs(cust.xCoord - depot_loc[0]) + abs(cust.yCoord - depot_loc[1]), 0)
             # modify the whole row so that all the distances are the same for 4 possible routes
 
             tmp = [case_distance, (1000, 1000), (1000, 1000), (1000, 1000)]
@@ -40,20 +40,20 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
         # 1) shortest through the zone
         # 2) shortest avoiding the zone
         # other 2 routes should be filled with something (perhaps inf?)
-        if inner_zone_coords[0] < cust.getXCoord() < inner_zone_coords[2] and \
-                0 < cust.getYCoord() < inner_zone_coords[1]:
+        if inner_zone_coords[0] < cust.xCoord < inner_zone_coords[2] and \
+                cust.yCoord < inner_zone_coords[1]:
             # 1) shortest through the zone, (blocks outside inner zone, blocks inside inner zone)
-            case1_distance = (abs(cust.getXCoord() - depot_loc[0]) + abs(cust.getYCoord() - depot_loc[1]) -
-                              (inner_zone_coords[3] + inner_zone_coords[1]),
-                              inner_zone_coords[3] + inner_zone_coords[1])
+            case1_distance = (abs(cust.xCoord - depot_loc[0]) + abs(cust.yCoord - depot_loc[1]) -
+                              (inner_zone_coords[3] - inner_zone_coords[1]),
+                              inner_zone_coords[3] - inner_zone_coords[1])
             # 2) shortest avoiding the zone
             case2_distance_a = abs(inner_zone_coords[0] - depot_loc[0]) + abs(inner_zone_coords[1] - depot_loc[1]) + \
-                               abs(inner_zone_coords[0] - cust.getXCoord()) + abs(
-                inner_zone_coords[1] - cust.getYCoord())
+                               abs(inner_zone_coords[0] - cust.xCoord) + abs(
+                inner_zone_coords[1] - cust.yCoord)
 
             case2_distance_b = abs(inner_zone_coords[2] - depot_loc[0]) + abs(
-                inner_zone_coords[1] - depot_loc[1]) + abs(inner_zone_coords[2] - cust.getXCoord()) + abs(
-                inner_zone_coords[1] - cust.getYCoord())
+                inner_zone_coords[1] - depot_loc[1]) + abs(inner_zone_coords[2] - cust.xCoord) + abs(
+                inner_zone_coords[1] - cust.yCoord)
 
             # fill the proper row that corresponds to a customer
             case2_distance = (min(case2_distance_a, case2_distance_b), 0)
@@ -64,15 +64,17 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             tmp = []
 
         # if customer falls into case 2, i.e. has coord in the zone, then 4 different paths are possible.
-        else:
+        # this else should be fixed
+        elif inner_zone_coords[0] < cust.xCoord < inner_zone_coords[2] and \
+                inner_zone_coords[1] < cust.yCoord < inner_zone_coords[3]:
             # step 1: find 4 entry points: direct distances from a customer to a edges and these are inner distances
             # points: 1-left, 2-down, 3-up, 4-right
             # a point contain coords and number of blocks inside a zone
 
-            entry_pt_1 = [(inner_zone_coords[0], cust.getYCoord()), abs(inner_zone_coords[0] - cust.getXCoord())]
-            entry_pt_2 = [(cust.getXCoord(), inner_zone_coords[1]), abs(inner_zone_coords[1] - cust.getYCoord())]
-            entry_pt_3 = [(cust.getXCoord(), inner_zone_coords[2]), abs(inner_zone_coords[2] - cust.getYCoord())]
-            entry_pt_4 = [(inner_zone_coords[3], cust.getYCoord()), abs(inner_zone_coords[3] - cust.getXCoord())]
+            entry_pt_1 = [(inner_zone_coords[0], cust.yCoord), abs(inner_zone_coords[0] - cust.xCoord)]
+            entry_pt_2 = [(cust.xCoord, inner_zone_coords[1]), abs(inner_zone_coords[1] - cust.yCoord)]
+            entry_pt_3 = [(cust.xCoord, inner_zone_coords[2]), abs(inner_zone_coords[2] - cust.yCoord)]
+            entry_pt_4 = [(inner_zone_coords[3], cust.yCoord), abs(inner_zone_coords[3] - cust.xCoord)]
 
             # step 2: find the distance to all entry points avoiding inner zone
             # to points 1, 3, 4 it's easy; to point 2 need to use same approach as for the case 3 -> min(A, B)
