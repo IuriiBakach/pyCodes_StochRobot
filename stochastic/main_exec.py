@@ -9,14 +9,14 @@ robotSpeed = 3
 maxTravelDist = 6
 
 # _____parameters of the gamma distribution
-shapePar = 2
+shapePar = 1
 scalePar = 1
 # create initial data: customers, depots, routes.
 
 # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 # a stub for future setofDepots = []
 
-depot = Depot(0, 0, 0)
+depot = Depot(0, 1.2, 1.7)
 depot.setNumberOfRobots(3)
 
 # create customers. This should be read in form the .csv file but it's ok for now
@@ -154,3 +154,4 @@ print(earl + latte)
 # final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
 #print(final_ans[0])
+print(distances)
