@@ -73,8 +73,8 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
 
             entry_pt_1 = [(inner_zone_coords[0], cust.yCoord), abs(inner_zone_coords[0] - cust.xCoord)]
             entry_pt_2 = [(cust.xCoord, inner_zone_coords[1]), abs(inner_zone_coords[1] - cust.yCoord)]
-            entry_pt_3 = [(cust.xCoord, inner_zone_coords[2]), abs(inner_zone_coords[2] - cust.yCoord)]
-            entry_pt_4 = [(inner_zone_coords[3], cust.yCoord), abs(inner_zone_coords[3] - cust.xCoord)]
+            entry_pt_3 = [(cust.xCoord, inner_zone_coords[3]), abs(inner_zone_coords[3] - cust.yCoord)]
+            entry_pt_4 = [(inner_zone_coords[2], cust.yCoord), abs(inner_zone_coords[2] - cust.xCoord)]
 
             # step 2: find the distance to all entry points avoiding inner zone
             # to points 1, 3, 4 it's easy; to point 2 need to use same approach as for the case 3 -> min(A, B)
@@ -98,6 +98,45 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             tmp = []
 
     return distance_matrix
+
+
+def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
+    """
+    This function has to take in a distance matrix, then for every customer find the smallest linear combination and
+    return it. Return the index of the best combination in a separate array.
+
+    :param distance_matrix_raw:
+    :param los_matrix:
+    :param cust_list:
+    :return:
+    """
+
+    # setup a set of needed shape and scale parameters
+    shape_zone_out = los_matrix[0][0][0]
+    shape_zone_in = los_matrix[0][1][0]
+    scale_par = los_matrix[0][0][1]
+    robot_speed = 3
+
+    # create an empty distance matrix and index matrix
+    trimmed_matr = np.zeros((1, len(cust_list) + 1))
+    best_path_indices = [0]
+
+    best_path_time = 999999
+    # go through all paths for customers
+    for index_upp, elem in enumerate(distance_matrix_raw):
+        # go through every path
+        for index, path in enumerate(elem):
+            # compute a length of a path
+            curr_path_time = (path[0] * shape_zone_out + path[1] * shape_zone_in) / robot_speed
+            if curr_path_time < best_path_time:
+                best_path_time = curr_path_time
+                best_path_time_index = index
+
+        trimmed_matr[0][index_upp + 1] = best_path_time
+        best_path_indices.append(best_path_time_index)
+        best_path_time = 999999
+
+    return trimmed_matr, best_path_indices
 
 
 def expected_delay(shape, scale_par, uppertw):

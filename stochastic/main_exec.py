@@ -11,7 +11,7 @@ maxTravelDist = 6
 # Create an initial matrix for shape and scale values for different zones and times
 # col = zone, row = hours
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
-los_matrix[0] = [(1, 1), (2, 1)]
+los_matrix[0] = [(1, 1), (3, 1)]
 # fill it with appropriate values here
 
 
@@ -30,7 +30,7 @@ depot.setNumberOfRobots(3)
 # now I think all time windows should be scaled to 8 am -> 0
 
 custList = []
-with open('customersTest.csv', 'r') as file:
+with open('customers.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
@@ -53,10 +53,14 @@ depotCoords = [1.2, 1.7]
 zoneCoords = [.3, .6, 1.7, 1.3]
 
 # create a matrix of distances from depot(s) to customers
-distances = all_distances(depotCoords, custList, zoneCoords)
 
-# for cust in custList:
+distances_raw = all_distances(depotCoords, custList, zoneCoords)
+distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
 print(distances)
+print(path_indices)
+# for elem in distances:
+#    for elem1 in elem:
+#        print(elem1)
 
 '''
 distances = np.zeros((1, len(custList) + 1))
@@ -65,8 +69,8 @@ distances = np.zeros((1, len(custList) + 1))
 # not round trip. robot speed to be removed when corresponding alphas are taken into account
 for i in range(0, len(custList)):
     distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
-
 '''
+
 
 '''
 print(distances)
