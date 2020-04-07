@@ -11,7 +11,7 @@ maxTravelDist = 6
 # Create an initial matrix for shape and scale values for different zones and times
 # col = zone, row = hours
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
-los_matrix[0] = [(1, 1), (3, 1)]
+los_matrix[0] = [(1, 1), (1, 1)]
 # fill it with appropriate values here
 
 
@@ -56,6 +56,7 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
+print(distances_raw)
 print(distances)
 print(path_indices)
 # for elem in distances:
