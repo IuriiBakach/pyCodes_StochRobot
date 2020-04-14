@@ -24,8 +24,8 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
     for index, cust in enumerate(list_of_cust):
         # if customer falls into case 1, i.e. same upper zone with the depot, need to compute Manh distances and
         # fill all 4 cells with the same values. check this
-        if cust.yCoord > inner_zone_coords[3] or cust.xCoord < inner_zone_coords[0] or cust.xCoord > inner_zone_coords[
-            2]:
+        if cust.yCoord >= inner_zone_coords[3] or cust.xCoord <= inner_zone_coords[0] or cust.xCoord >= \
+                inner_zone_coords[2]:
             # compute manhattan distance
             case_distance = (abs(cust.xCoord - depot_loc[0]) + abs(cust.yCoord - depot_loc[1]), 0)
             # modify the whole row so that all the distances are the same for 4 possible routes
@@ -35,13 +35,13 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
             distance_matrix[index] = tmp
             tmp = []
 
-        # if if customer falls into case 3, i.e. is in the lower part of the graph directly below the zone.
+        # if customer falls into case 3, i.e. is in the lower part of the graph directly below the zone.
         # in this case we have 2 possible routes:
         # 1) shortest through the zone
         # 2) shortest avoiding the zone
         # other 2 routes should be filled with something (perhaps inf?)
         if inner_zone_coords[0] < cust.xCoord < inner_zone_coords[2] and \
-                cust.yCoord < inner_zone_coords[1]:
+                cust.yCoord <= inner_zone_coords[1]:
             # 1) shortest through the zone, (blocks outside inner zone, blocks inside inner zone)
             case1_distance = (abs(cust.xCoord - depot_loc[0]) + abs(cust.yCoord - depot_loc[1]) -
                               (inner_zone_coords[3] - inner_zone_coords[1]),

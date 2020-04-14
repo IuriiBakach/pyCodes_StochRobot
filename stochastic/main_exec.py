@@ -11,11 +11,11 @@ maxTravelDist = 6
 # Create an initial matrix for shape and scale values for different zones and times
 # col = zone, row = hours
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
-los_matrix[0] = [(1, 1), (1, 1)]
-# fill it with appropriate values here
-
 
 # _____parameters of the gamma distribution
+los_matrix[0] = [(1, 1), (2, 1)]
+# these are just stub values, potentially to update later
+
 shapePar = 1
 scalePar = 1
 # create initial data: customers, depots, routes.
@@ -23,7 +23,7 @@ scalePar = 1
 # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(3)
+depot.setNumberOfRobots(2)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
@@ -56,9 +56,10 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
-print(distances_raw)
-print(distances)
-print(path_indices)
+
+# print(distances_raw)
+# print(distances)
+# print(path_indices)
 # for elem in distances:
 #    for elem1 in elem:
 #        print(elem1)
@@ -144,7 +145,6 @@ for i in range(0, len(custList)):
     # and remove a customer from a list of initial customers
     custList.remove(cust_to_ins)
 """
-'''
 
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
@@ -152,22 +152,21 @@ routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[11], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
 
-routePlan[1].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[9], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[0], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[12], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-
-routePlan[2].insert_customer(1, custList[7], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[1], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[14], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[6], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[5], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
-routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[7], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[5], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
 
 # need to run this tabu search
 
@@ -178,5 +177,3 @@ routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
 final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
 print(final_ans[0])
-
-'''
