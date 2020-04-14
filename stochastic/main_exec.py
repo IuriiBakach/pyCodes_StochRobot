@@ -30,7 +30,7 @@ depot.setNumberOfRobots(2)
 # now I think all time windows should be scaled to 8 am -> 0
 
 custList = []
-with open('customers.csv', 'r') as file:
+with open('customersTest.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
@@ -57,9 +57,12 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
 
-# print(distances_raw)
+print(distances_raw)
 # print(distances)
-# print(path_indices)
+distances[0][2] = .8
+distances[0][3] = .6
+print(distances)
+print(path_indices)
 # for elem in distances:
 #    for elem1 in elem:
 #        print(elem1)
@@ -145,11 +148,12 @@ for i in range(0, len(custList)):
     # and remove a customer from a list of initial customers
     custList.remove(cust_to_ins)
 """
-
+'''
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+
 routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
@@ -167,13 +171,22 @@ routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[5], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
-
+'''
 # need to run this tabu search
 
-# earl = routePlan[0].total_earliness() + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-# latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
 
-# print(earl + latte)
-final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
+latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
 
-print(final_ans[0])
+print(routePlan[0])
+print(earl)
+print(latte)
+print(earl + latte)
+
+# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+
+# print(final_ans[0])
