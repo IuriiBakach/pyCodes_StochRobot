@@ -1,5 +1,5 @@
 import csv
-
+import itertools
 import numpy as np
 
 from classes_needed import *
@@ -35,8 +35,6 @@ with open('customersTest.csv', 'r') as file:
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
 
-
-
 # create a corresponding RoutePlan based on the number of robots in the depot
 
 routePlan = []
@@ -57,12 +55,6 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
 
-print(distances_raw)
-# print(distances)
-distances[0][2] = .8
-distances[0][3] = .6
-print(distances)
-print(path_indices)
 # for elem in distances:
 #    for elem1 in elem:
 #        print(elem1)
@@ -75,7 +67,6 @@ distances = np.zeros((1, len(custList) + 1))
 for i in range(0, len(custList)):
     distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
 '''
-
 
 '''
 print(distances)
@@ -173,19 +164,37 @@ routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
 '''
 # need to run this tabu search
+dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1]]
 
-routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+combs = list(itertools.product(*dists))
+# print(combs)
 
-earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+# what do I need to report?
+# I need to check the obj function value after every run and report the one with the smallest value along with the
+# choice of the distances and id?
 
-print(routePlan[0])
-print(earl)
-print(latte)
-print(earl + latte)
+for indexing, elem in enumerate(combs):
+    # print(distances_raw)
+    # print(distances)
+    distances[0] = elem
+    print(distances)
+    #    print(path_indices)
+
+    routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+
+    earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
+    latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+
+    print(routePlan[0])
+    print(earl)
+    print(latte)
+    print(earl + latte)
+    routePlan = []
+    for elem1 in range(depot.getNumberRobots()):
+        routePlan.append(Route(elem1))
 
 # final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
