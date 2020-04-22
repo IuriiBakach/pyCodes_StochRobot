@@ -172,30 +172,46 @@ combs = list(itertools.product(*dists))
 # what do I need to report?
 # I need to check the obj function value after every run and report the one with the smallest value along with the
 # choice of the distances and id?
+best_obj = 1000
+best_earl = 1000
+best_latte = 1000
 
 for indexing, elem in enumerate(combs):
     # print(distances_raw)
     # print(distances)
     distances[0] = elem
+
+    print(indexing)
     print(distances)
-    #    print(path_indices)
 
     routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
 
-    earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-    latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+    curr_earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
+    curr_latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+    curr_obj = curr_earl + curr_latte
 
-    print(routePlan[0])
-    print(earl)
-    print(latte)
-    print(earl + latte)
+    if curr_obj < best_obj:
+        best_obj = curr_obj
+        best_earl = curr_earl
+        best_latte = curr_latte
+        best_paths = indexing
+        curr_plan = routePlan[0]
+
+    # print(routePlan[0])
+    # print(earl)
+    # print(latte)
+    # print(earl + latte)
     routePlan = []
     for elem1 in range(depot.getNumberRobots()):
         routePlan.append(Route(elem1))
+    # print(indexing)
 
 # final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
 # print(final_ans[0])
+
+print("earliness: {}, lateness: {}, obj value: {}, path_set: {}, routePlan: {}".format(best_earl, best_latte, best_obj,
+                                                                                       best_paths, curr_plan))
