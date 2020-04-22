@@ -184,10 +184,10 @@ for indexing, elem in enumerate(combs):
     print(indexing)
     print(distances)
 
-    routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
 
     curr_earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
     curr_latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
