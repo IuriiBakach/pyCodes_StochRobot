@@ -23,7 +23,7 @@ scalePar = 1
 # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(2)
+depot.setNumberOfRobots(1)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
@@ -55,127 +55,95 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
 
+print(type(distances))
+
 # for elem in distances:
 #    for elem1 in elem:
 #        print(elem1)
 
-'''
-distances = np.zeros((1, len(custList) + 1))
-
-# ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
-# not round trip. robot speed to be removed when corresponding alphas are taken into account
-for i in range(0, len(custList)):
-    distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
-'''
-
-'''
-print(distances)
-# seems lite that's it for the init phase
-
-# now I need to fill initial routes with customers
-print(routePlan[0])
-
-
-routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-print(routePlan[0])
-
-routePlan[0].insert_customer(2, custList[1], distances, shapePar, scalePar)
-print(routePlan[0])
-
-routePlan[0].remove_customer(2, distances, shapePar, scalePar)
-print(routePlan[0])
-
-routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-print(routePlan[0])
-
-routePlan[0].remove_customer(1, distances, shapePar, scalePar)
-print(routePlan[0])
-
-
-routePlan[0].insert_customer(2, custList[3], distances, shapePar, scalePar)
-print(routePlan[0])
-
-routePlan[0].insert_customer(2, custList[0], distances, shapePar, scalePar)
-print(routePlan[0])
-
-'''
-"""
-# After having a list of customers and routes I need to create initial set of routes filed with customers.
-# Step 1: take empty routes. For all customers check all insertion positions based on the measures and insert
-# those customers 1 by 1.
-
-# need to replace this while by for indexed over the number of customers in the customer list
-
-for i in range(0, len(custList)):
-    print(len(custList))
-    obj_fun_change = float("inf")
-
-    # for every customer and route
-    for customer in custList:
-        for route in routePlan:
-            # for every position
-            for position, elem in enumerate(route.currentRoute, 1):
-                # compute measures before and after the customer is inserted
-                prev_lateness = route.total_lateness()
-                prev_earliness = route.total_earliness()
-                route.insert_customer(position, customer, distances, shapePar, scalePar)
-                curr_lateness = route.total_lateness()
-                curr_earliness = route.total_earliness()
-                # change in the earl\laten
-                change_in_measures = curr_earliness - prev_earliness + curr_lateness - prev_lateness
-
-                # update the insertion location if needed
-                if change_in_measures < obj_fun_change:
-                    cust_to_ins = customer
-                    route_to_ins = route.id
-                    pos_to_ins = position
-                    # need to update upper bound on the measure to make sure it updates when needed, not always
-                    obj_fun_change = change_in_measures
-                # once everything is computed and compared, restore the route
-                route.remove_customer(position, distances, shapePar, scalePar)
-
-    # after all customers and positions are checked finally insert a customer into a route
-    routePlan[route_to_ins].insert_customer(pos_to_ins, cust_to_ins, distances, shapePar, scalePar)
-    # and remove a customer from a list of initial customers
-    custList.remove(cust_to_ins)
-"""
-'''
-routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-
-routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[11], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-
-routePlan[1].insert_customer(1, custList[12], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[7], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[1], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[5], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
-'''
 # need to run this tabu search
-dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1]]
 
-combs = list(itertools.product(*dists))
-# print(combs)
+# dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1],
+#         [0.76666667, .8, 0.76666667, 1.3], [0.83333333, 0.86666667], [0.1], [1.16666667, .9, .4, 0.76666667]]
 
-# what do I need to report?
-# I need to check the obj function value after every run and report the one with the smallest value along with the
-# choice of the distances and id?
+dists = np.asarray([[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1]])
+
+print(type(dists))
+
+dist_combs = np.asarray(list(itertools.product(*dists)))
+
+stb = [0, 1, 2, 3]
+cust_id_combs = np.asarray(list(itertools.permutations(stb)))
+
+# to do: 1) create all possible combinations of customers and paths
+# for each customer combination run all the paths and save one with the best obj func value
+# report only the best path and a path selection
+
 best_obj = 1000
 best_earl = 1000
 best_latte = 1000
 
+best_overall_obj = 1000
+best_overall_earl = 1000
+best_overall_latte = 1000
+best_overall_paths = []
+best_overall_plan = 0
+
+# for every set of custs
+for indexing_custs, cust_elem in enumerate(cust_id_combs):
+    # for every set of paths
+    for indexing_paths, path_elem in enumerate(dist_combs):
+        distances[0] = path_elem
+        # add all custs to the route
+        routePlan[0].insert_customer(1, custList[cust_elem[0]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(2, custList[cust_elem[1]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(3, custList[cust_elem[2]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(4, custList[cust_elem[3]], distances, shapePar, scalePar)
+        # routePlan[0].insert_customer(5, custList[cust_elem[4]], distances, shapePar, scalePar)
+        # routePlan[0].insert_customer(6, custList[cust_elem[5]], distances, shapePar, scalePar)
+        # routePlan[0].insert_customer(7, custList[cust_elem[6]], distances, shapePar, scalePar)
+        # routePlan[0].insert_customer(1, custList[cust_elem[7]], distances, shapePar, scalePar)
+
+        # compute objective function value
+
+        curr_earl = routePlan[0].total_earliness()
+        curr_latte = routePlan[0].total_lateness()
+        curr_obj = curr_earl + curr_latte
+
+        # update best solution if needed
+        if curr_obj < best_obj:
+            best_obj = curr_obj
+            best_earl = curr_earl
+            best_latte = curr_latte
+            best_paths = indexing_paths
+            curr_plan = routePlan[0]
+
+        routePlan = []
+        for elem1 in range(depot.getNumberRobots()):
+            routePlan.append(Route(elem1))
+
+        # after all paths for a given route are checked, update best route so far
+
+    if best_obj < best_overall_obj:
+        best_overall_obj = best_obj
+        best_overall_earl = best_earl
+        best_overall_latte = best_latte
+        best_overall_paths = best_paths
+        best_overall_plan = indexing_custs
+
+    print(indexing_custs)
+
+    best_obj = 1000
+    best_earl = 1000
+    best_latte = 1000
+
+print("earliness: {}, lateness: {}, obj value: {}, path_set: {}, routePlan: {}".format(best_overall_earl,
+                                                                                       best_overall_latte,
+                                                                                       best_overall_obj,
+                                                                                       best_overall_paths,
+                                                                                       best_overall_plan))
+
+'''
 for indexing, elem in enumerate(combs):
     # print(distances_raw)
     # print(distances)
@@ -189,8 +157,10 @@ for indexing, elem in enumerate(combs):
     routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
 
-    curr_earl = routePlan[0].total_earliness()  # + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-    curr_latte = routePlan[0].total_lateness()  # + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+    print(routePlan[0].currentRoute)
+
+    curr_earl = routePlan[0].total_earliness()
+    curr_latte = routePlan[0].total_lateness()
     curr_obj = curr_earl + curr_latte
 
     if curr_obj < best_obj:
@@ -212,6 +182,6 @@ for indexing, elem in enumerate(combs):
 # final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
 # print(final_ans[0])
-
-print("earliness: {}, lateness: {}, obj value: {}, path_set: {}, routePlan: {}".format(best_earl, best_latte, best_obj,
-                                                                                       best_paths, curr_plan))
+'''
+# print("earliness: {}, lateness: {}, obj value: {}, path_set: {}, routePlan: {}".format(best_earl, best_latte, best_obj,
+#                                                                                       best_paths, curr_plan))
