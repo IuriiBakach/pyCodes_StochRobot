@@ -66,13 +66,14 @@ print(type(distances))
 # dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1],
 #         [0.76666667, .8, 0.76666667, 1.3], [0.83333333, 0.86666667], [0.1], [1.16666667, .9, .4, 0.76666667]]
 
-dists = np.asarray([[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1]])
+dists = np.asarray([[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1],
+                    [0.76666667, .8, 0.76666667, 1.3], [0.83333333, 0.86666667], [0.1]])
 
 print(type(dists))
 
 dist_combs = np.asarray(list(itertools.product(*dists)))
 
-stb = [0, 1, 2, 3]
+stb = [0, 1, 2, 3, 4, 5, 6]
 cust_id_combs = np.asarray(list(itertools.permutations(stb)))
 
 # to do: 1) create all possible combinations of customers and paths
@@ -99,9 +100,9 @@ for indexing_custs, cust_elem in enumerate(cust_id_combs):
         routePlan[0].insert_customer(2, custList[cust_elem[1]], distances, shapePar, scalePar)
         routePlan[0].insert_customer(3, custList[cust_elem[2]], distances, shapePar, scalePar)
         routePlan[0].insert_customer(4, custList[cust_elem[3]], distances, shapePar, scalePar)
-        # routePlan[0].insert_customer(5, custList[cust_elem[4]], distances, shapePar, scalePar)
-        # routePlan[0].insert_customer(6, custList[cust_elem[5]], distances, shapePar, scalePar)
-        # routePlan[0].insert_customer(7, custList[cust_elem[6]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(5, custList[cust_elem[4]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(6, custList[cust_elem[5]], distances, shapePar, scalePar)
+        routePlan[0].insert_customer(7, custList[cust_elem[6]], distances, shapePar, scalePar)
         # routePlan[0].insert_customer(1, custList[cust_elem[7]], distances, shapePar, scalePar)
 
         # compute objective function value
