@@ -69,7 +69,6 @@ print(type(distances))
 dists = np.asarray([[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1],
                     [0.76666667, .8, 0.76666667, 1.3], [0.83333333, 0.86666667], [0.1]])
 
-print(type(dists))
 
 dist_combs = np.asarray(list(itertools.product(*dists)))
 
