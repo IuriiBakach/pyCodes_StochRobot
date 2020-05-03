@@ -17,14 +17,14 @@ scalePar = 1
 # a stub for future setofDepots = []
 
 depot = Depot(0, 1.2, 1.7)
-depot.setNumberOfRobots(3)
+depot.setNumberOfRobots(1)
 
 # create customers. This should be read in form the .csv file but it's ok for now
 # 480 correspond to 8am. 1020 to 5pm
 # now I think all time windows should be scaled to 8 am -> 0
 
 custList = []
-with open('customers.csv', 'r') as file:
+with open('customersTest.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
@@ -47,8 +47,11 @@ distances = np.zeros((1, len(custList) + 1))
 
 # ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
 # not round trip. robot speed to be removed when corresponding alphas are taken into account
-for i in range(0, len(custList)):
-    distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
+
+# for i in range(0, len(custList)):
+#    distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
+
+distances[0] = [0., 0.56666667, 0.7, 0.53333333, 0.46666667, 0.76666667, 0.83333333, 0.1]
 
 '''
 print(distances)
@@ -122,13 +125,15 @@ for i in range(0, len(custList)):
     custList.remove(cust_to_ins)
 """
 
+routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
 
+'''
 routePlan[1].insert_customer(1, custList[2], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[9], distances, shapePar, scalePar)
@@ -144,14 +149,15 @@ routePlan[2].insert_customer(1, custList[6], distances, shapePar, scalePar)
 routePlan[2].insert_customer(1, custList[5], distances, shapePar, scalePar)
 routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
 routePlan[2].insert_customer(1, custList[13], distances, shapePar, scalePar)
+'''
 
 # need to run this tabu search
 
-earl = routePlan[0].total_earliness() + routePlan[1].total_earliness() + routePlan[2].total_earliness()
-latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
+# earl = routePlan[0].total_earliness()# + routePlan[1].total_earliness() + routePlan[2].total_earliness()
+# latte = routePlan[0].total_lateness()# + routePlan[1].total_lateness() + routePlan[2].total_lateness()
 
-print(earl + latte)
-# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+# print(earl + latte)
+final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-#print(final_ans[0])
-print(distances)
+print(final_ans[0])
+#print(distances)
