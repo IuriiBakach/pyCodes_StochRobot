@@ -164,7 +164,11 @@ routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
 routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
 '''
 # need to run this tabu search
-dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1]]
+# dists = [[0], [0.56666667], [.8, .7], [1.46666667, .7, .6, 0.53333333], [.86666667, 1.1, .46666667, 1],
+#                    [0.76666667, 0.8,  0.76666667, 1.3], [0.83333333, 0.86666667], [0.1]]
+
+dists = [[0], [0.56666667], [.8], [0.53333333], [.46666667],
+         [1.3], [0.83333333], [0.1]]
 
 combs = list(itertools.product(*dists))
 # print(combs)
@@ -184,8 +188,11 @@ for indexing, elem in enumerate(combs):
     print(indexing)
     print(distances)
 
+    routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
     routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
 
