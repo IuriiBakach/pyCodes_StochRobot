@@ -90,13 +90,12 @@ class Route:
 
     def insert_customer(self, pos, cust, distMatr, shape, scale):
         # __________ insert a customer into a specific position in the route
-        # __________ distances is a matrix of distances from a depot to all customers
+        # __________ distances is a matrix of travel times from a depot to all customers
         # index starts from 0
 
         self.currentRoute.insert(pos, cust)
 
         # __________ earliness/delays for every cust should be recomputed
-        # ___________early and late TW for every cust in the routes are to be recomputed.I'll leave that for now
 
         # add distance to the customer into the list of distances
         self.distances.insert(pos, distMatr[0][cust.getId()])
@@ -108,8 +107,6 @@ class Route:
 
         # ______ if initially the route is not empty
 
-        # tmp =  self.currentRoute[pos - 1].getId()
-
         if self.distances[pos - 1] != 0:
             change = self.distances[pos] + self.distances[pos - 1] + distMatr[0][self.currentRoute[pos - 1].getId()]
             self.distances[pos] = change
@@ -119,6 +116,7 @@ class Route:
         # update all the subsequent numbers
         if pos + 1 != len(self.distances):
             for i, elem in enumerate(self.distances[pos + 1:], 1):
+                # need to add recharge time here
                 self.distances[pos + i] = elem + 2 * distMatr[0][cust.getId()]
         # ______ if initially the route is empty
         elif self.distances[pos - 1] == 0:
@@ -147,7 +145,7 @@ class Route:
         self.distances.pop(pos)
         if pos != len(self.currentRoute) + 1:
             for i, elem in enumerate(self.distances[pos:], 0):
-                # need to substruct travel time
+                # need to subtract travel time
                 self.distances[pos + i] = self.distances[pos + i] - 2 * distance_to_removed_customer
 
         # ________earliness

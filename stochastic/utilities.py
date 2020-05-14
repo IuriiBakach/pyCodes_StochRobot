@@ -105,11 +105,13 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     This function has to take in a distance matrix, then for every customer find the smallest linear combination and
     return it. Return the index of the best combination in a separate array.
 
-    :param distance_matrix_raw:
-    :param los_matrix:
-    :param cust_list:
-    :return:
+    :param distance_matrix_raw: matrix of all distances
+    :param los_matrix: pedestrian intensity los
+    :param cust_list: list of all customers
+    :return: expected travel time, indices of the best paths in terms of expected travel time
     """
+
+    service_time = 1 / 30
 
     # setup a set of needed shape and scale parameters
     shape_zone_out = los_matrix[0][0][0]
@@ -120,6 +122,8 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     # create an empty distance matrix and index matrix
     trimmed_matr = np.zeros((1, len(cust_list) + 1))
     best_path_indices = [0]
+
+    best_paths = [0]
 
     best_path_time = 999999
     # go through all paths for customers
@@ -132,11 +136,22 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
                 best_path_time = curr_path_time
                 best_path_time_index = index
 
+                best_path = path
+
         trimmed_matr[0][index_upp + 1] = best_path_time
         best_path_indices.append(best_path_time_index)
+        best_paths.append(best_path)
+
         best_path_time = 999999
 
-    return trimmed_matr, best_path_indices
+    # add service time to expected travel time
+
+    trimmed_matr[0] = trimmed_matr[0] + service_time
+    trimmed_matr[0][0] = 0
+
+    # I also need to return distances for the best paths
+
+    return trimmed_matr, best_path_indices, best_paths
 
 
 def expected_delay(shape, scale_par, uppertw):

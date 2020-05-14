@@ -55,14 +55,24 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 # create a matrix of distances from depot(s) to customers
 
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
-distances, path_indices = dist_matr_trim(distances_raw, los_matrix, custList)
+distances, path_indices, best_paths = dist_matr_trim(distances_raw, los_matrix, custList)
 
-# print(distances_raw)
-# print(distances)
-# print(path_indices)
-# for elem in distances:
-#    for elem1 in elem:
-#        print(elem1)
+print(distances_raw)
+print(distances)
+print(path_indices)
+print(best_paths)
+
+# get total distances to customers in km as np array
+
+best_paths_distance_combined = []
+for index, elem in enumerate(best_paths):
+    if elem == 0:
+        best_paths_distance_combined.append(elem)
+    else:
+        best_paths_distance_combined.append(elem[0] + elem[1])
+
+print(best_paths_distance_combined)
+best_paths_distance_combined = np.asarray(best_paths_distance_combined)
 
 '''
 distances = np.zeros((1, len(custList) + 1))
@@ -147,7 +157,7 @@ for i in range(0, len(custList)):
 """
 
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[19], distances, shapePar, scalePar)
+routePlan[0].insert_customer(2, custList[19], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
@@ -174,6 +184,6 @@ routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
 # latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
 
 # print(earl + latte)
-final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-print(final_ans[0])
+#print(final_ans[0])
