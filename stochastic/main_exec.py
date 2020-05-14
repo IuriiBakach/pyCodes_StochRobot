@@ -158,7 +158,7 @@ for i in range(0, len(custList)):
 
 routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
 routePlan[0].insert_customer(2, custList[19], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[0].insert_customer(2, custList[4], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
