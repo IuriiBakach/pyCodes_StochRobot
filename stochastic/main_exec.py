@@ -35,8 +35,6 @@ with open('customers.csv', 'r') as file:
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
 
-
-
 # create a corresponding RoutePlan based on the number of robots in the depot
 
 routePlan = []
@@ -57,10 +55,10 @@ zoneCoords = [.3, .6, 1.7, 1.3]
 distances_raw = all_distances(depotCoords, custList, zoneCoords)
 distances, path_indices, best_paths = dist_matr_trim(distances_raw, los_matrix, custList)
 
-print(distances_raw)
-print(distances)
-print(path_indices)
-print(best_paths)
+# print(distances_raw)
+# print(distances)
+# print(path_indices)
+# print(best_paths)
 
 # get total distances to customers in km as np array
 
@@ -71,8 +69,24 @@ for index, elem in enumerate(best_paths):
     else:
         best_paths_distance_combined.append(elem[0] + elem[1])
 
-print(best_paths_distance_combined)
+# print(best_paths_distance_combined)
 best_paths_distance_combined = np.asarray(best_paths_distance_combined)
+
+# potentially there is a need to further diversify the customer and paths to see what customer is in what zone
+
+# print the output data:
+# total distance
+# total expected travel time
+# paths selected
+
+total_exp_travel_time = 0
+total_exp_distance = 0
+
+stub = distances[0] - 1 / 30
+stub[0] = 0
+
+total_exp_travel_time = sum(stub) * 2
+total_exp_distance = sum(best_paths_distance_combined)
 
 '''
 distances = np.zeros((1, len(custList) + 1))
@@ -82,7 +96,6 @@ distances = np.zeros((1, len(custList) + 1))
 for i in range(0, len(custList)):
     distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
 '''
-
 
 '''
 print(distances)
@@ -184,6 +197,22 @@ routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
 # latte = routePlan[0].total_lateness() + routePlan[1].total_lateness() + routePlan[2].total_lateness()
 
 # print(earl + latte)
-# final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-#print(final_ans[0])
+# print(final_ans[0])
+
+# results outputs
+
+print("Total expected travelled distance is {} ".format(total_exp_distance))
+print("Total expected travel time is {} ".format(total_exp_travel_time))
+print("Paths selected are {} ".format(path_indices))
+
+print("Final set of routes: ", final_ans[0][0])
+
+print("Total earliness by routes: ")
+for elem in final_ans[0][0]: print(elem.total_earliness())
+
+print("Total lateness by routes: ")
+for elem in final_ans[0][0]: print(elem.total_lateness())
+
+print("Total obj function: ", final_ans[0][1])
