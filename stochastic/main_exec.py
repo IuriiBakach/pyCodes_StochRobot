@@ -13,6 +13,7 @@ maxTravelDist = 6
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
 # _____parameters of the gamma distribution
+# (shape, scale) outer/ (shape, scale) inner
 los_matrix[0] = [(1, 1), (2, 1)]
 # these are just stub values, potentially to update later
 
