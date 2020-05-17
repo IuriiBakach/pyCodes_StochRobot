@@ -357,7 +357,7 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
     :param customerList: initial customer list
     :param currentSolutionRoutes: current solution
     :param max_cand_list_len: how many candidates to create
-    :param distances: matrix of distacne between customers
+    :param distances: matrix of distance between customers
     :param shape: shape
     :param scale: scale
     :return: a sorted list of possible moves

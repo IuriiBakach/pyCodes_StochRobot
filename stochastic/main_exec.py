@@ -1,5 +1,4 @@
 import csv
-
 import numpy as np
 
 from classes_needed import *
@@ -25,9 +24,7 @@ scalePar = 1
 depot = Depot(0, 0, 0)
 depot.setNumberOfRobots(2)
 
-# create customers. This should be read in form the .csv file but it's ok for now
-# 480 correspond to 8am. 1020 to 5pm
-# now I think all time windows should be scaled to 8 am -> 0
+# read in customers
 
 custList = []
 with open('customers.csv', 'r') as file:
