@@ -18,7 +18,7 @@ write it into the same csv file
 zoneCoords = [.3, .6, 1.7, 1.3]
 
 custList = []
-with open('customersTest.csv', 'r') as file:
+with open('9.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
@@ -32,8 +32,7 @@ for elem in custList:
 
 # now all the tws are modified. The next step is to override the csv file
 
-with open('customersTestWriter.csv', mode='w', newline='') as csv_file:
-    fieldnames = ['id', 'xCoord', 'yCoord', 'eTW', 'lTW']
+with open('9.csv', mode='w', newline='') as csv_file:
     writer = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 
     for elem in custList:

@@ -12,7 +12,7 @@ maxTravelDist = 6
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
 # _____parameters of the gamma distribution
-los_matrix[0] = [(1, 1), (2, 1)]
+los_matrix[0] = [(1, 1), (1, 1)]
 # these are just stub values, potentially to update later
 
 shapePar = 1
@@ -22,12 +22,12 @@ scalePar = 1
 # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
 depot = Depot(0, 0, 0)
-depot.setNumberOfRobots(2)
+depot.setNumberOfRobots(3)
 
 # read in customers
 
 custList = []
-with open('customers.csv', 'r') as file:
+with open('1.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
         custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
@@ -166,27 +166,28 @@ for i in range(0, len(custList)):
     custList.remove(cust_to_ins)
 """
 
-routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-routePlan[0].insert_customer(2, custList[19], distances, shapePar, scalePar)
-routePlan[0].insert_customer(2, custList[4], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[15], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[16], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[11], distances, shapePar, scalePar)
-routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
 routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+routePlan[0].insert_customer(2, custList[1], distances, shapePar, scalePar)
+routePlan[0].insert_customer(2, custList[2], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
 
-routePlan[1].insert_customer(1, custList[12], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[7], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[1], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[6], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[5], distances, shapePar, scalePar)
-routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[7], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[8], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[9], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[11], distances, shapePar, scalePar)
+routePlan[2].insert_customer(1, custList[12], distances, shapePar, scalePar)
+
 routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[16], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
+routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
 
 # need to run this tabu search
 
