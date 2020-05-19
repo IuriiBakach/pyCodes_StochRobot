@@ -410,9 +410,9 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     """
 
     # to begin I need to specify all the required parameters
-    max_iter = 200
-    no_impr_iter_max = 40
-    max_cand_list_len = 50
+    max_iter = 1000
+    no_impr_iter_max = 100
+    max_cand_list_len = 100
     iteration = 0
     no_impr_iter = 0
 

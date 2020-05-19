@@ -13,7 +13,7 @@ def main():
     los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
     # _____parameters of the gamma distribution; order -> shape outer zone, shape inner zone
-    los_matrix[0] = [(1, 1), (4, 1)]
+    los_matrix[0] = [(1, 1), (1, 1)]
     # these are just stub values, potentially to update later
 
     print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
@@ -36,7 +36,7 @@ def main():
         # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
         depot = Depot(0, 0, 0)
-        depot.setNumberOfRobots(3)
+        depot.setNumberOfRobots(7)
 
         # create a corresponding RoutePlan based on the number of robots in the depot
 
@@ -125,6 +125,7 @@ def main():
         routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
         routePlan[2].insert_customer(1, custList[11], distances, shapePar, scalePar)
         routePlan[2].insert_customer(1, custList[12], distances, shapePar, scalePar)
+        routePlan[2].insert_customer(1, custList[42], distances, shapePar, scalePar)
 
         routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
         routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
@@ -133,6 +134,39 @@ def main():
         routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
         routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
         routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
+
+        routePlan[3].insert_customer(1, custList[20], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[21], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[22], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[23], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[24], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[25], distances, shapePar, scalePar)
+        routePlan[3].insert_customer(1, custList[26], distances, shapePar, scalePar)
+
+        routePlan[4].insert_customer(1, custList[27], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[28], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[29], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[30], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[31], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[32], distances, shapePar, scalePar)
+        routePlan[4].insert_customer(1, custList[33], distances, shapePar, scalePar)
+
+        routePlan[5].insert_customer(1, custList[34], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[35], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[36], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[37], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[38], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[39], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[40], distances, shapePar, scalePar)
+        routePlan[5].insert_customer(1, custList[41], distances, shapePar, scalePar)
+
+        routePlan[6].insert_customer(1, custList[43], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[44], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[45], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[46], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[47], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[48], distances, shapePar, scalePar)
+        routePlan[6].insert_customer(1, custList[49], distances, shapePar, scalePar)
 
         # need to run this tabu search
         final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
