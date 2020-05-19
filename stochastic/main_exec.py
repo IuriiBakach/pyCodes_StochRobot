@@ -16,6 +16,8 @@ def main():
     los_matrix[0] = [(1, 1), (4, 1)]
     # these are just stub values, potentially to update later
 
+    print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
+
     shapePar = 1
     scalePar = 1
     # create initial data: customers, depots, routes.
