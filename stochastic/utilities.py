@@ -434,8 +434,8 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
 
     # start outer main while loop
     while iteration <= max_iter and no_impr_iter <= no_impr_iter_max:
-        # print("curr iter ", iteration)
-        # print("no impr ", no_impr_iter)
+        print("curr iter ", iteration)
+        print("no impr ", no_impr_iter)
 
         # create a candidate list
         candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shape, scale)
