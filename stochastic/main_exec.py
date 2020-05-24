@@ -18,6 +18,9 @@ def main():
 
     print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
+    # this approach works only with the case if I am not to touch scale which is bad and I need to rework it in the way
+    # scale parameter can be varied and taken into account
+
     shapePar = 1
     scalePar = 1
     # create initial data: customers, depots, routes.
@@ -235,3 +238,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+"""
+how do I model the change of initial departure time? essentially it just the arrival time to the first customer.
+
+one way is to add a dummy customer to all routes into the first position that will guarantee that the arrival time to
+the actual customer 1 happens later. I think I'll do this
+"""
