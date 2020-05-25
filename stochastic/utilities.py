@@ -111,7 +111,7 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     :return: expected travel time, indices of the best paths in terms of expected travel time
     """
 
-    service_time = 1 / 30
+    service_time = 2
 
     # setup a set of needed shape and scale parameters
     shape_zone_out = los_matrix[0][0][0]
@@ -146,7 +146,7 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
 
     # add service time to expected travel time
 
-    trimmed_matr[0] = trimmed_matr[0] + service_time
+    trimmed_matr[0] = trimmed_matr[0] * 60 + service_time
     trimmed_matr[0][0] = 0
 
     # I also need to return distances for the best paths

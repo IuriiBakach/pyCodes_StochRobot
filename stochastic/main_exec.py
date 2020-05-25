@@ -3,241 +3,204 @@ import numpy as np
 
 from classes_needed import *
 
+# def main():
+# set initial parameters
+robotSpeed = 3
 
-def main():
-    # set initial parameters
-    robotSpeed = 3
+# Create an initial matrix for shape and scale values for different zones and times
+# col = zone, row = hours
+los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
-    # Create an initial matrix for shape and scale values for different zones and times
-    # col = zone, row = hours
-    los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
+# _____parameters of the gamma distribution; order -> shape outer zone, shape inner zone
+los_matrix[0] = [(1, 1), (4, 1)]
+# these are just stub values, potentially to update later
 
-    # _____parameters of the gamma distribution; order -> shape outer zone, shape inner zone
-    los_matrix[0] = [(1, 1), (1, 1)]
-    # these are just stub values, potentially to update later
+print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
-    print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
+# this approach works only with the case if I am not to touch scale which is bad and I need to rework it in the way
+# scale parameter can be varied and taken into account
 
-    # this approach works only with the case if I am not to touch scale which is bad and I need to rework it in the way
-    # scale parameter can be varied and taken into account
+shapePar = 1
+scalePar = 1
+# create initial data: customers, depots, routes.
 
-    shapePar = 1
-    scalePar = 1
-    # create initial data: customers, depots, routes.
+# how about create a list with a set of csv files and then run the alg over all of them
+csv_list = ['1.csv', '2.csv']  # , '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
 
-    # how about create a list with a set of csv files and then run the alg over all of them
-    csv_list = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
+for item in csv_list:
+    # read in customers
+    custList = []
+    with open(item, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
 
-    for item in csv_list:
-        # read in customers
-        custList = []
-        with open(item, 'r') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
+    # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
-        # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
+    depot = Depot(0, 0, 0)
+    depot.setNumberOfRobots(2)
 
-        depot = Depot(0, 0, 0)
-        depot.setNumberOfRobots(7)
+    # create a corresponding RoutePlan based on the number of robots in the depot
 
-        # create a corresponding RoutePlan based on the number of robots in the depot
+    routePlan = []
 
-        routePlan = []
+    # create a copy of customers for the tabu search
+    custList_tabu = copy.deepcopy(custList)
 
-        # create a copy of customers for the tabu search
-        custList_tabu = copy.deepcopy(custList)
+    # create a list of routes with the number of empty routes corresponding to the number of robots in the depot
 
-        # create a list of routes with the number of empty routes corresponding to the number of robots in the depot
+    for elem in range(depot.getNumberRobots()):
+        routePlan.append(Route(elem))
 
-        for elem in range(depot.getNumberRobots()):
-            routePlan.append(Route(elem))
+    depotCoords = [1.2, 1.7]
+    zoneCoords = [.3, .6, 1.7, 1.3]
 
-        depotCoords = [1.2, 1.7]
-        zoneCoords = [.3, .6, 1.7, 1.3]
+    # create a matrix of distances from depot(s) to customers
 
-        # create a matrix of distances from depot(s) to customers
+    distances_raw = all_distances(depotCoords, custList, zoneCoords)
+    distances, path_indices, best_paths = dist_matr_trim(distances_raw, los_matrix, custList)
 
-        distances_raw = all_distances(depotCoords, custList, zoneCoords)
-        distances, path_indices, best_paths = dist_matr_trim(distances_raw, los_matrix, custList)
+    # print(distances_raw)
+    # print(distances)
+    # print(path_indices)
+    # print(best_paths)
 
-        # print(distances_raw)
-        # print(distances)
-        # print(path_indices)
-        # print(best_paths)
+    # get total distances to customers in km as np array
 
-        # get total distances to customers in km as np array
+    best_paths_distance_combined = []
+    for index, elem in enumerate(best_paths):
+        if elem == 0:
+            best_paths_distance_combined.append(elem)
+        else:
+            best_paths_distance_combined.append(elem[0] + elem[1])
 
-        best_paths_distance_combined = []
-        for index, elem in enumerate(best_paths):
-            if elem == 0:
-                best_paths_distance_combined.append(elem)
-            else:
-                best_paths_distance_combined.append(elem[0] + elem[1])
+    # at this point all distances are one-way distances. They are needed to be multiplied by 2 to get the full picture
+    best_paths_distance_combined = np.asarray(best_paths_distance_combined)
 
-        # at this point all distances are one-way distances. They are needed to be multiplied by 2 to get the full picture
-        best_paths_distance_combined = np.asarray(best_paths_distance_combined)
+    # potentially there is a need to further diversify the customer and paths to see what customer is in what zone
 
-        # potentially there is a need to further diversify the customer and paths to see what customer is in what zone
+    # print the output data:
+    # total distance
+    # total expected travel time
+    # paths selected
 
-        # print the output data:
-        # total distance
-        # total expected travel time
-        # paths selected
+    # total_exp_travel_time = 0
+    total_exp_distance = 0
 
-        # total_exp_travel_time = 0
-        total_exp_distance = 0
+    # stub = distances[0] - 1 / 30
+    # stub[0] = 0
 
-        # stub = distances[0] - 1 / 30
-        # stub[0] = 0
+    # total_exp_travel_time = sum(stub) * 2
+    total_exp_distance = sum(best_paths_distance_combined) * 2
 
-        # total_exp_travel_time = sum(stub) * 2
-        total_exp_distance = sum(best_paths_distance_combined) * 2
+    '''
+    distances = np.zeros((1, len(custList) + 1))
+    
+    # ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
+    # not round trip. robot speed to be removed when corresponding alphas are taken into account
+    for i in range(0, len(custList)):
+        distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
+    '''
 
-        '''
-        distances = np.zeros((1, len(custList) + 1))
-        
-        # ________ this returns a vector of distances form a depot to every customer in hours with robots speed;
-        # not round trip. robot speed to be removed when corresponding alphas are taken into account
-        for i in range(0, len(custList)):
-            distances[0][i + 1] = (abs(custList[i].xCoord - depot.xCoord) + abs(custList[i].yCoord - depot.yCoord))/robotSpeed
-        '''
+    '''
+    # now I need to fill initial routes with customers
+    print(routePlan[0])
+    
+    routePlan[0].insert_customer(2, custList[3], distances, shapePar, scalePar)
+    print(routePlan[0])
+    
+    routePlan[0].insert_customer(2, custList[0], distances, shapePar, scalePar)
+    print(routePlan[0])  
+    '''
 
-        '''
-        # now I need to fill initial routes with customers
-        print(routePlan[0])
-        
-        routePlan[0].insert_customer(2, custList[3], distances, shapePar, scalePar)
-        print(routePlan[0])
-        
-        routePlan[0].insert_customer(2, custList[0], distances, shapePar, scalePar)
-        print(routePlan[0])  
-        '''
+    routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[7], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
+    routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
 
-        routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
-        routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[12], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[16], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
+    routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
 
-        routePlan[2].insert_customer(1, custList[7], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[8], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[9], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[10], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[11], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[12], distances, shapePar, scalePar)
-        routePlan[2].insert_customer(1, custList[42], distances, shapePar, scalePar)
+    # need to run this tabu search
+    final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
 
-        routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[16], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
-        routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
+    # results outputs
+    best_paths = best_paths[1:]
 
-        routePlan[3].insert_customer(1, custList[20], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[21], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[22], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[23], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[24], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[25], distances, shapePar, scalePar)
-        routePlan[3].insert_customer(1, custList[26], distances, shapePar, scalePar)
+    # consider total travelled inner and outer distances
+    total_exp_distance_inner = 0
+    total_exp_distance_outer = 0
 
-        routePlan[4].insert_customer(1, custList[27], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[28], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[29], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[30], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[31], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[32], distances, shapePar, scalePar)
-        routePlan[4].insert_customer(1, custList[33], distances, shapePar, scalePar)
+    for elem in best_paths:
+        total_exp_distance_inner += elem[1]
+        total_exp_distance_outer += elem[0]
 
-        routePlan[5].insert_customer(1, custList[34], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[35], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[36], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[37], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[38], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[39], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[40], distances, shapePar, scalePar)
-        routePlan[5].insert_customer(1, custList[41], distances, shapePar, scalePar)
+    print("Traveled distance INside the zone is {} ".format(2 * total_exp_distance_inner))
+    print("Traveled distance OUTside the zone is {} ".format(2 * total_exp_distance_outer))
+    print("Total distance traveled is {} ".format(total_exp_distance))
 
-        routePlan[6].insert_customer(1, custList[43], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[44], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[45], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[46], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[47], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[48], distances, shapePar, scalePar)
-        routePlan[6].insert_customer(1, custList[49], distances, shapePar, scalePar)
+    # need to compute expected travel times in inner/outer zones
 
-        # need to run this tabu search
-        final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+    total_exp_travel_time_inner = 0
+    total_exp_travel_time_outer = 0
 
-        # results outputs
-        best_paths = best_paths[1:]
+    for elem in best_paths:
+        total_exp_travel_time_inner += elem[1] * los_matrix[0][1][0]
+        total_exp_travel_time_outer += elem[0] * los_matrix[0][0][0]
 
-        # consider total travelled inner and outer distances
-        total_exp_distance_inner = 0
-        total_exp_distance_outer = 0
+    total_exp_travel_time_inner = 2 * total_exp_travel_time_inner / robotSpeed
+    total_exp_travel_time_outer = 2 * total_exp_travel_time_outer / robotSpeed
 
-        for elem in best_paths:
-            total_exp_distance_inner += elem[1]
-            total_exp_distance_outer += elem[0]
+    print("Expected inner travel time is {:.6} ".format(total_exp_travel_time_inner))
+    print("Expected outer travel time is {:.6} ".format(total_exp_travel_time_outer))
 
-        print("Traveled distance INside the zone is {} ".format(2 * total_exp_distance_inner))
-        print("Traveled distance OUTside the zone is {} ".format(2 * total_exp_distance_outer))
-        print("Total distance traveled is {} ".format(total_exp_distance))
+    total_exp_travel_time = 0
 
-        # need to compute expected travel times in inner/outer zones
+    # for each elem in the best path compute corresponding total expected travel times
+    for elem in best_paths:
+        total_exp_travel_time += elem[0] * los_matrix[0][0][0] + elem[1] * los_matrix[0][1][0]
 
-        total_exp_travel_time_inner = 0
-        total_exp_travel_time_outer = 0
+    # to get a total expected travel time I need to multiply it by 2
+    total_exp_travel_time = 2 * total_exp_travel_time / robotSpeed
 
-        for elem in best_paths:
-            total_exp_travel_time_inner += elem[1] * los_matrix[0][1][0]
-            total_exp_travel_time_outer += elem[0] * los_matrix[0][0][0]
+    print("Total expected travel time is {:.6} ".format(total_exp_travel_time))
+    print("Paths selected are {} ".format(path_indices))
 
-        total_exp_travel_time_inner = 2 * total_exp_travel_time_inner / robotSpeed
-        total_exp_travel_time_outer = 2 * total_exp_travel_time_outer / robotSpeed
+    print("Final set of routes: ", final_ans[0][0])
 
-        print("Expected inner travel time is {:.6} ".format(total_exp_travel_time_inner))
-        print("Expected outer travel time is {:.6} ".format(total_exp_travel_time_outer))
+    t_earl = 0
+    t_lateness = 0
 
-        total_exp_travel_time = 0
+    # Total earliness by routes
+    for elem in final_ans[0][0]:
+        t_earl += elem.total_earliness()
 
-        # for each elem in the best path compute corresponding total expected travel times
-        for elem in best_paths:
-            total_exp_travel_time += elem[0] * los_matrix[0][0][0] + elem[1] * los_matrix[0][1][0]
+    print('Percentage of earliness is {:.4}'.format(t_earl / final_ans[0][1]))
 
-        # to get a total expected travel time I need to multiply it by 2
-        total_exp_travel_time = 2 * total_exp_travel_time / robotSpeed
+    # Total lateness by routes
+    for elem in final_ans[0][0]:
+        t_lateness += elem.total_lateness()
 
-        print("Total expected travel time is {:.6} ".format(total_exp_travel_time))
-        print("Paths selected are {} ".format(path_indices))
+    print('Percentage of lateness is {:.4}'.format(t_lateness / final_ans[0][1]))
 
-        print("Final set of routes: ", final_ans[0][0])
+    print("Total obj function is {:.6} ".format(final_ans[0][1]))
 
-        t_earl = 0
-        t_lateness = 0
-
-        # Total earliness by routes
-        for elem in final_ans[0][0]:
-            t_earl += elem.total_earliness()
-
-        print('Percentage of earliness is {:.4}'.format(t_earl / final_ans[0][1]))
-
-        # Total lateness by routes
-        for elem in final_ans[0][0]:
-            t_lateness += elem.total_lateness()
-
-        print('Percentage of lateness is {:.4}'.format(t_lateness / final_ans[0][1]))
-
-        print("Total obj function is {:.6} ".format(final_ans[0][1]))
-
-
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#    main()
 
 """
 how do I model the change of initial departure time? essentially it just the arrival time to the first customer.
