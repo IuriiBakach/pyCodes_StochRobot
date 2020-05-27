@@ -214,5 +214,30 @@ only distance * shape for computations and scale separately. That being said, wh
 I can use distance*shape and that would be the content of self.distances
 
 or those can be only distances I compute. So I return to the triplet. Do I also need a cumulative shape then?
+I guess I do
 
+Ok, so how do I do it? 
+step 1: compute resulting paths as (distance, resulting shape, scale)
+step 2: redo insert/remove customer from a route so the 3 independent numbers are being tracked : total distance, 
+total shape and scale(?) instead of just distance
+step 3: update computations for earliness/lateness 
+
+there is a questions of how to get a combined shape if for all of the chuncks it's different? how about this approach: 
+whenever I add a customer I just add it to the list with corresponding id without any dist/whatever recomputations. 
+At this point whenever I add a cust I have only a route with custs, and their corresp data. Then, all earliness and
+lateness in getting computed in the separate function and just returned separately using distances and shapes. 
+
+Similar procedure with removal: find the position, remove cust with proper dist and shape and compute ealiness and
+lateness. Potentially I can get some computations into the earliness/lateness function outside to decrease a number of 
+operations 
+
+How would shifting work from now? If I do it this way I'll just have to add to an array of shape coeffs a fixed number
+that also depends on the scale parameter so that mean arrival time is shifted correspondingly
+(which is, I assume, n/scale)
+
+things still left to do:
+
+update lateness_array
+redo the simplified version of customer_insert and customer_delete
+DEBUG!!!11
 """
