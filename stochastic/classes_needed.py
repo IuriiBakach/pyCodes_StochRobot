@@ -140,7 +140,7 @@ class Route:
         # now I can safely remove it
         self.currentRoute.pop(pos)  # pop starts form a 0-position
 
-        # I recompute distances by substructing from all subsequent customers the time it take to get and come back
+        # I recompute distances by subtracting from all subsequent customers the time it take to get and come back
         # to the removed customer, unless it's on the last position
         self.distances.pop(pos)
         if pos != len(self.currentRoute) + 1:

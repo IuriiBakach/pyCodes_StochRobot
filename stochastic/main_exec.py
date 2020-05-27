@@ -207,4 +207,12 @@ how do I model the change of initial departure time? essentially it just the arr
 
 one way is to add a dummy customer to all routes into the first position that will guarantee that the arrival time to
 the actual customer 1 happens later. I think I'll do this
+
+how to proceed witt shape/scale revision. Whenever I initially compute best paths I need to return 
+(distance, resulting shape, scale). In order to get mean travel time I need to multiply everything. However I need 
+only distance * shape for computations and scale separately. That being said, whenever I add/remove customer
+I can use distance*shape and that would be the content of self.distances
+
+or those can be only distances I compute. So I return to the triplet. Do I also need a cumulative shape then?
+
 """
