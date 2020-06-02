@@ -58,6 +58,8 @@ for item in csv_list:
     # create a matrix of distances from depot(s) to customers
 
     distances_raw = all_distances(depotCoords, custList, zoneCoords)
+
+    # as of now, distances contain (distance, shape coeff)
     distances, path_indices, best_paths = dist_matr_trim(distances_raw, los_matrix, custList)
 
     # print(distances_raw)
@@ -237,7 +239,13 @@ that also depends on the scale parameter so that mean arrival time is shifted co
 
 things still left to do:
 
-update lateness_array
 redo the simplified version of customer_insert and customer_delete
 DEBUG!!!11
+how to debug: 
+1) check if paths are computed correctly
+2) check if cust addition is rights
+3) check if obj function is right
+
+
+add waiting. Think about it can be done
 """

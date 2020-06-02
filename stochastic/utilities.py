@@ -102,7 +102,7 @@ def all_distances(depot_loc, list_of_cust, inner_zone_coords):
 
 def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     """
-    This function has to take in a distance matrix, then for every customer find the best path in terms of expexted
+    This function has to take in a distance matrix, then for every customer find the best path in terms of expected
     travel time. The output is an array of tuples of the form (distance, res_shape) along with path indices
 
     no need to keep scale par since it's always the same and initially given
@@ -168,7 +168,8 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     trimmed_matr[0] = trimmed_matr[0][1] * 60
     trimmed_matr[0][0] = (0, 0)
 
-    # I also need to return distances for the best paths
+    # trimmed_matr returns all the corresponding distances and shape values for the best paths for all custs.
+    # 0-position is depot
 
     return trimmed_matr, best_path_indices, best_paths
 
@@ -234,6 +235,22 @@ def earliness_array(precomputed_distances, customers_in_route, shape, scale):
     return earliness
 
 
+def lateness_array(precomputed_distances, customers_in_route, shape, scale):
+    """
+    This function recomputes lateness for all customers based on the current route
+
+    :param precomputed_distances: distances (time) to all current customers given all previous are visited
+    :param customers_in_route: list of customer in the route
+    :param shape: shape parameter for gamma distribution
+    :param scale: scale parameter for gamma distribution
+    :return: a list of computed lateness'
+    """
+    lateness = [0] * len(precomputed_distances)
+    for i, elem in enumerate(precomputed_distances[1:], 1):
+        lateness[i] = expected_delay(shape * elem, scale, customers_in_route[i].getLateTW())
+    return lateness
+
+
 def earliness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     """
     This is an updated function of an earliness array. The idea is to take inputs in the form of the cust_distance,
@@ -272,20 +289,42 @@ def earliness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     return earliness
 
 
-def lateness_array(precomputed_distances, customers_in_route, shape, scale):
+def lateness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     """
-    This function recomputes lateness for all customers based on the current route
+    This is an updated function of a lateness array. The idea is to take inputs in the form of the cust_distance,
+    shape parameters and return lateness for all customers given the accumulated manner of the expected arrival time.
 
-    :param precomputed_distances: distances (time) to all current customers given all previous are visited
-    :param customers_in_route: list of customer in the route
-    :param shape: shape parameter for gamma distribution
+    This computation is performed for 1 current route only
+
+    :param cust_ordering: order of customers in the route. TYPE = list with cust's based on positions
+    :param to_cust_distances: distances to customers from a hub. TYPE = list with corresponding distances
+    :param to_cust_shape: shape parameter to be used together with distances. Essentially, the product of distance and
+            shape is the shape to use in the expected_earliness function
     :param scale: scale parameter for gamma distribution
-    :return: a list of computed lateness'
+    :return: a list of computed earliness'
     """
-    lateness = [0] * len(precomputed_distances)
-    for i, elem in enumerate(precomputed_distances[1:], 1):
-        lateness[i] = expected_delay(shape * elem, scale, customers_in_route[i].getLateTW())
-    return lateness
+
+    # step 1: I need to get \alpha_jv, a shape of arrival to custs.
+
+    # check if cust ordering has a depot as 0-cust
+
+    # this array contains arrival times to customers in the form of \alpha_jv
+    exp_arrival_shape = [0] * len(cust_ordering)
+
+    # compute all the expected shape of arrivals
+    for index, elem in enumerate(exp_arrival_shape):
+        if index == 0:
+            elem = to_cust_distances[index] * to_cust_shape[index]
+        else:
+            elem = exp_arrival_shape[elem - 1] + to_cust_distances[index] * to_cust_shape[index]
+
+    # step 2: once I have them, I can send each of them into the expected_earliness function
+
+    earliness = [0] * len(cust_ordering)
+    for index, elem in enumerate(exp_arrival_shape):
+        earliness = expected_earliness(elem, scale, cust_ordering[index].getEarlyTW())
+    # need to debug
+    return earliness
 
 
 def one_shift(cust1, cust2, route_plan, distMatr, shape, scale):

@@ -59,16 +59,18 @@ class Customer:
 
 
 class Route:
-    def __init__(self, id):
-        self.id = id
+    def __init__(self, route_id):
+        self.id = route_id
         self.currentRoute = []
         # _________add a depot as a starting location_________
         depot = Depot(0, 0, 0)
         self.currentRoute.append(depot)
-        # _________ total distance a robot travelled on this route_____
+        # _________ a distance to every customer on this route_____
         # _________ add 0-s since the first location in the depot for every route
         self.distances = []
         self.distances.append(0)
+        self.shapes = []
+        self.shapes.append(1)
         self.earliness = []
         self.earliness.append(0)
         self.lateness = []
@@ -87,6 +89,36 @@ class Route:
         except ValueError:
             pass
         '''
+
+    def insert_customer_v_2(self, pos, cust, distances, shapes, scale):
+        """
+        This method inserts customer into the route and updates/recomputes earliness/lateness
+
+        For the earliness/lateness recomputations I need:
+        1) list of custs
+        2) to-cust-distances
+        3) shape parameters of the paths preferred (not cumulative shape values)
+
+        :param pos: a position to insert a customer
+        :param cust: a customer to insert
+        :param distances: an array of raw distances of the "best" paths
+        :param shapes: an array of shape par values of the "best" paths
+        :param scale: scale parameter of the gamma distribution
+
+        """
+
+        # 1) add a customer to a route:
+        self.currentRoute.insert(pos, cust)
+
+        # 2) add a distance to the customer to an array of distances
+        self.distances.insert(pos, distances[cust.getId()])
+
+        # 3) add a shape value to an array of shapes
+        self.shapes.insert(pos, shapes[cust.getId()])
+
+        # recompute earliness and lateness after addition
+        self.earliness = earliness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
+        self.lateness = lateness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
 
     def insert_customer(self, pos, cust, distMatr, shape, scale):
         # __________ insert a customer into a specific position in the route
@@ -129,6 +161,21 @@ class Route:
 
         self.earliness = earliness_array(self.distances, self.currentRoute, shape, scale)
         self.lateness = lateness_array(self.distances, self.currentRoute, shape, scale)
+
+    def remove_customer_v_2(self):
+
+        # 1) add a customer to a route:
+        self.currentRoute.insert(pos, cust)
+
+        # 2) add a distance to the customer to an array of distances
+        self.distances.insert(pos, distances[cust.getId()])
+
+        # 3) add a shape value to an array of shapes
+        self.shapes.insert(pos, shapes[cust.getId()])
+
+        # recompute earliness and lateness after addition
+        self.earliness = earliness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
+        self.lateness = lateness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
 
     def remove_customer(self, pos, distMatr, shape, scale):
         # _________ remove a customer from the position specified
