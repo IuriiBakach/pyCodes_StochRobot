@@ -111,16 +111,16 @@ class Route:
         self.currentRoute.insert(pos, cust)
 
         # 2) add a distance to the customer to an array of distances
-        self.distances.insert(pos, distances[cust.getId()])
+        self.distances.insert(pos, distances[0][cust.getId()])
 
         # 3) add a shape value to an array of shapes
-        self.shapes.insert(pos, shapes[cust.getId()])
+        self.shapes.insert(pos, shapes[0][cust.getId()])
 
         # recompute earliness and lateness after addition
         self.earliness = earliness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
         self.lateness = lateness_array_v_2(self.currentRoute, self.distances, self.shapes, scale)
 
-    def remove_customer_v_2(self, pos, cust, distances, shapes, scale):
+    def remove_customer_v_2(self, pos, scale):
         """
         This method removes customer from the route and updates/recomputes earliness/lateness
 

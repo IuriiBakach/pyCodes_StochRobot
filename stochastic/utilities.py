@@ -115,7 +115,7 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
 
     # how do I compute the resulting shape? dist_outer*shape_outer+dist_inner*shape_inner/dist_outer+dist_inner
 
-    service_time = 2
+    service_time = 1 / 30
 
     # setup a set of needed shape and scale parameters
     shape_zone_out = los_matrix[0][0][0]
@@ -124,7 +124,9 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
     robot_speed = 3
 
     # create an empty distance matrix and index matrix
-    trimmed_matr = np.zeros((1, len(cust_list) + 1))
+    trimmed_matr_dist = np.zeros((1, len(cust_list) + 1))
+    trimmed_matr_shape = np.zeros((1, len(cust_list) + 1))
+
     best_path_indices = [0]
 
     best_paths = [0]
@@ -139,8 +141,8 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
             curr_path_time = ((path[0] * shape_zone_out + path[1] * shape_zone_in) / robot_speed) + service_time
             # compute distance
             curr_path_distance = path[0] + path[1]
-            # compute resulting shape coeff
-            curr_res_shape = curr_path_time / curr_path_distance
+            # compute resulting shape coeff in the way it takes into account scale parameter too
+            curr_res_shape = curr_path_time / (curr_path_distance * scale_par)
 
             if curr_path_time < best_path_time:
                 # keep track of best results for the customer
@@ -156,7 +158,8 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
         # ho do I include service time then?
 
         # add best distance and best shape coeff to the matrix
-        trimmed_matr[0][index_upp + 1] = (best_path_distance, best_res_shape)
+        trimmed_matr_dist[0][index_upp + 1] = best_path_distance
+        trimmed_matr_shape[0][index_upp + 1] = best_res_shape
 
         # update the outputs
         best_path_indices.append(best_path_time_index)
@@ -165,13 +168,16 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
         best_path_time = 999999
         curr_path_distance = 999999
 
-    trimmed_matr[0] = trimmed_matr[0][1] * 60
-    trimmed_matr[0][0] = (0, 0)
+    # multiply by 60 in order to get in minutes
+    # trimmed_matr[0][1] = trimmed_matr[0][1]
+
+    trimmed_matr_dist[0][0] = 0
+    trimmed_matr_shape[0][0] = 0
 
     # trimmed_matr returns all the corresponding distances and shape values for the best paths for all custs.
     # 0-position is depot
 
-    return trimmed_matr, best_path_indices, best_paths
+    return trimmed_matr_dist, trimmed_matr_shape, best_path_indices, best_paths
 
 
 def expected_delay(shape, scale_par, uppertw):
@@ -276,16 +282,27 @@ def earliness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     # compute all the expected shape of arrivals
     for index, elem in enumerate(exp_arrival_shape):
         if index == 0:
-            elem = to_cust_distances[index] * to_cust_shape[index]
+            exp_arrival_shape[index] = to_cust_distances[index] * to_cust_shape[index]
         else:
-            elem = exp_arrival_shape[elem - 1] + to_cust_distances[index] * to_cust_shape[index]
+            # I need to not just add a previous exp arrival time, but also the time to return
+            exp_arrival_shape[index] = exp_arrival_shape[index - 1] + to_cust_distances[index - 1] * to_cust_shape[
+                index - 1] + to_cust_distances[index] * to_cust_shape[index]
 
     # step 2: once I have them, I can send each of them into the expected_earliness function
-
     earliness = [0] * len(cust_ordering)
-    for index, elem in enumerate(exp_arrival_shape):
-        earliness = expected_earliness(elem, scale, cust_ordering[index].getEarlyTW())
-    # need to debug
+
+    # start with the first element and then afterwards add 0 in the beginning
+
+    exp_arrival_shape = exp_arrival_shape[1:]
+
+    for index, elem in enumerate(exp_arrival_shape, 1):
+        tmp = cust_ordering[index].getEarlyTW()
+        earliness_elem = expected_earliness(elem, scale, cust_ordering[index].getEarlyTW())
+        earliness[index] = earliness_elem
+
+    # insert 0's because of the depot
+    exp_arrival_shape.insert(0, 0)
+
     return earliness
 
 
@@ -314,17 +331,29 @@ def lateness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     # compute all the expected shape of arrivals
     for index, elem in enumerate(exp_arrival_shape):
         if index == 0:
-            elem = to_cust_distances[index] * to_cust_shape[index]
+            exp_arrival_shape[index] = to_cust_distances[index] * to_cust_shape[index]
         else:
-            elem = exp_arrival_shape[elem - 1] + to_cust_distances[index] * to_cust_shape[index]
+            # I need to not just add a previous exp arrival time, but also the time to return
+            exp_arrival_shape[index] = exp_arrival_shape[index - 1] + to_cust_distances[index - 1] * to_cust_shape[
+                index - 1] + to_cust_distances[index] * to_cust_shape[index]
 
     # step 2: once I have them, I can send each of them into the expected_earliness function
 
-    earliness = [0] * len(cust_ordering)
-    for index, elem in enumerate(exp_arrival_shape):
-        earliness = expected_earliness(elem, scale, cust_ordering[index].getEarlyTW())
-    # need to debug
-    return earliness
+    lateness = [0] * len(cust_ordering)
+
+    # start with the first element and then afterwards add 0 in the beginning
+
+    exp_arrival_shape = exp_arrival_shape[1:]
+
+    for index, elem in enumerate(exp_arrival_shape, 1):
+        tmp = cust_ordering[index].getLateTW()
+        lateness_elem = expected_delay(elem, scale, cust_ordering[index].getLateTW())
+        lateness[index] = lateness_elem
+    # insert 0's because of the depot
+
+    exp_arrival_shape.insert(0, 0)
+
+    return lateness
 
 
 def one_shift(cust1, cust2, route_plan, distMatr, shape, scale):
@@ -648,4 +677,36 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         routePlan[route_to_ins].insert_customer(pos_to_ins, cust_to_ins, distances, shapePar, scalePar)
         # and remove a customer from a list of initial customers
         custList.remove(cust_to_ins)
+"""
+
+"""
+tw shift
+
+
+# [xLow, yLow, xUp, yUp]
+zoneCoords = [.3, .6, 1.7, 1.3]
+
+custList = []
+with open('9.csv', 'r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        custList.append(Customer(int(row[0]), float(row[1]), float(row[2]), float(row[3]), float(row[4])))
+
+for elem in custList:
+    if zoneCoords[0] < elem.xCoord < zoneCoords[2] and zoneCoords[1] < elem.yCoord < zoneCoords[3]:
+        if elem.lateTW < 8:
+            elem.lateTW += 1
+        else:
+            elem.earlyTW -= 1
+
+# now all the tws are modified. The next step is to override the csv file
+
+with open('9.csv', mode='w', newline='') as csv_file:
+    writer = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+
+    for elem in custList:
+        writer.writerow([elem.id, elem.xCoord, elem.yCoord, elem.earlyTW, elem.lateTW])
+
+csv_file.close()
+
 """
