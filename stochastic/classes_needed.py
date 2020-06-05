@@ -130,10 +130,7 @@ class Route:
         3) shape parameters of the paths preferred (not cumulative shape values)
 
         :param pos: a position to remove a customer from
-        :param cust: a customer to remove
-        :param distances: an array of raw distances of the "best" paths
-        :param shapes: an array of shape par values of the "best" paths
-        :param scale: scale parameter of the gamma distribution
+        :param scale: scale parameter of the gamma distribution (potentially not needed)
 
         """
         # 1) remove a customer from a route:

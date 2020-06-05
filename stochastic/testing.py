@@ -12,7 +12,7 @@ robotSpeed = 3
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
 # _____parameters of the gamma distribution; order -> (shape, scale) outer zone, (shape, scale) inner zone
-los_matrix[0] = [(1, 1), (2, 1)]
+los_matrix[0] = [(1, 1), (4, 1)]
 
 print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
@@ -80,6 +80,8 @@ for item in csv_list:
     routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
 
     routePlan[0].remove_customer_v_2(2, los_matrix[0][0][1])
+
+    routePlan[0].insert_customer_v_2(2, custList[1], distances, shapes, los_matrix[0][0][1])
 
     # insertion and removal work. What next?
     # I suppose check
