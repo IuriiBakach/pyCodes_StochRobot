@@ -12,7 +12,7 @@ robotSpeed = 3
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
 # _____parameters of the gamma distribution; order -> (shape, scale) outer zone, (shape, scale) inner zone
-los_matrix[0] = [(1, 1), (4, 1)]
+los_matrix[0] = [(1, 1), (2, 1)]
 
 print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
