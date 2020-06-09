@@ -91,3 +91,8 @@ for item in csv_list:
     # run tabu search
 
     final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
+
+    # tabu search is all good. (coincides with previous computations)
+    # now I need to design a waiting procedure
+
+    # use distances and shapes for every route. to compute their product. then Think about how to shift things
