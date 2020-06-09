@@ -26,7 +26,8 @@ def main():
     # create initial data: customers, depots, routes.
 
     # how about create a list with a set of csv files and then run the alg over all of them
-    csv_list = ['1.csv', '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
+    csv_list = [
+        'customersTest.csv']  # , '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
 
     for item in csv_list:
         # read in customers
