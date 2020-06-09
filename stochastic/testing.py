@@ -73,15 +73,21 @@ for item in csv_list:
 
     total_exp_distance = sum(best_paths_distance_combined) * 2
 
-    # check if customers are added/removed correctly
+    # add all customers
 
     routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
     routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
     routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
 
-    routePlan[0].remove_customer_v_2(2, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
 
-    routePlan[0].insert_customer_v_2(2, custList[1], distances, shapes, los_matrix[0][0][1])
+    #    routePlan[0].remove_customer_v_2(2, los_matrix[0][0][1])
 
     # insertion and removal work. What next?
-    # I suppose check
+    # next is tabu search. namely 1-shift and exchange
+    # run tabu search
+
+    final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])

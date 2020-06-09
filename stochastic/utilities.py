@@ -405,6 +405,57 @@ def one_shift(cust1, cust2, route_plan, distMatr, shape, scale):
     return [(cust1, cust2), total_earl + total_late, route_plan_copy]  # [route_plan, total_earl + total_late]
 
 
+def one_shift_v2(cust1, cust2, route_plan, distMatr, shapes, scale):
+    """
+    Execute a 1-shift (vertex reassignment) operator. That is remove first customer form a current route
+    and insert into the route after the second customer
+    :param cust1: customer to relocate
+    :param cust2: customer to insert cust1 after
+    :param route_plan: an initial set of routes
+    :param distMatr: matrix of distances form depot to customers
+    :param shapes: shape parameters for best paths
+    :param scale: scale parameter for gamma distribution
+
+    :return: change in objective function after this operation
+
+    """
+
+    # the procedure is the following: find customer 1 in the route_plan and remove this customer from it.
+    # then find the second customer and insert the first one after it. Report the change in the objective function
+
+    total_earl = 0
+    total_late = 0
+
+    route_plan_copy = copy.deepcopy(route_plan)
+
+    # find the location of the first customer in the route and remove it from the route if the customer is present in
+    # in that route
+    for route in route_plan_copy:
+        position_cust_one = route.find_customer_pos(cust1)
+        if type(position_cust_one) is int:
+            # route.remove_customer(position_cust_one, distMatr, shape, scale)
+            route.remove_customer_v_2(position_cust_one, scale)
+            break
+
+    # find the location of the second customer and insert customer 1 after it
+    for route in route_plan_copy:
+        position_cust_two = route.find_customer_pos(cust2)
+        if type(position_cust_two) is int:
+            # route.insert_customer(position_cust_two + 1, cust1, distMatr, shape, scale)
+            route.insert_customer_v_2(position_cust_two + 1, cust1, distMatr, shapes, scale)
+            break
+
+    # after the insertion has been completed, report the modified combined objective function
+
+    for route in route_plan_copy:
+        total_earl += route.total_earliness()
+        total_late += route.total_lateness()
+
+    # return modified route_plan and corresponding sum of the objective function
+
+    return [(cust1, cust2), total_earl + total_late, route_plan_copy]  # [route_plan, total_earl + total_late]
+
+
 def exchange(cust1, cust2, route_plan, distMatr, shape, scale):
     """
     This operation switches customer 1 and customer 2 in routes
@@ -460,6 +511,60 @@ def exchange(cust1, cust2, route_plan, distMatr, shape, scale):
     return [(cust1, cust2), total_earl + total_late, route_plan_copy]
 
 
+def exchange_v2(cust1, cust2, route_plan, distMatr, shapes, scale):
+    """
+    This operation switches customer 1 and customer 2 in routes
+
+    :param cust1: customer to relocate 1
+    :param cust2: customer to relocate 2
+    :param route_plan: an initial set of routes
+    :param distMatr: matrix of distances form depot to customers
+    :param shape: shape parameter for gamma distribution
+    :param scale: scale parameter for gamma distribution
+    :return: change in objective function after this operation
+    """
+
+    route_plan_copy = copy.deepcopy(route_plan)
+
+    total_earl = 0
+    total_late = 0
+
+    # find the locations of these 2 customers
+    for route in route_plan_copy:
+        position_cust_one = route.find_customer_pos(cust1)
+        if type(position_cust_one) is int:
+            loc_cust_one = [route.id, position_cust_one]
+            break
+
+    for route in route_plan_copy:
+        position_cust_two = route.find_customer_pos(cust2)
+        if type(position_cust_two) is int:
+            loc_cust_two = [route.id, position_cust_two]
+            break
+
+    # the next step is to remove those customers from routes, insert into new positions and return resulting routes
+    # and obj fcn
+
+    # the problem arises when I remove customers from the same route. Need to keep track of the positions of removed
+    # customers and insert into the proper positions afterwards. I.e. modify the next 4 lines accordingly
+
+    '''
+    insert customer 2 after customer 1, remove customer 1; insert customer 1 after customer 2, remove customer 2
+    '''
+
+    route_plan_copy[loc_cust_one[0]].insert_customer_v_2(position_cust_one, cust2, distMatr, shapes, scale)
+    route_plan_copy[loc_cust_one[0]].remove_customer_v_2(position_cust_one + 1, scale)
+
+    route_plan_copy[loc_cust_two[0]].insert_customer_v_2(position_cust_two, cust1, distMatr, shapes, scale)
+    route_plan_copy[loc_cust_two[0]].remove_customer_v_2(position_cust_two + 1, scale)
+
+    for route in route_plan_copy:
+        total_earl += route.total_earliness()
+        total_late += route.total_lateness()
+
+    return [(cust1, cust2), total_earl + total_late, route_plan_copy]
+
+
 def total_obj_fcn_route(routePlan):
     """
     This function computes the objective function for the list of routes
@@ -475,7 +580,7 @@ def total_obj_fcn_route(routePlan):
     return total_earl + total_late
 
 
-def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, distances, shape, scale):
+def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, distances, shapes, scale):
     """
     Create a candidate list of the len = max_cand_list_len for the tabu search
 
@@ -483,7 +588,7 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
     :param currentSolutionRoutes: current solution
     :param max_cand_list_len: how many candidates to create
     :param distances: matrix of distance between customers
-    :param shape: shape
+    :param shape: list of shapes for best paths
     :param scale: scale
     :return: a sorted list of possible moves
     """
@@ -505,13 +610,15 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
 
             # also need to check if this works after deepcopy!!!
 
-            operation = one_shift(customerList[r_cust_one - 1], customerList[r_cust_two - 1], currentSolutionRoutes[0],
-                                  distances, shape, scale)
+            operation = one_shift_v2(customerList[r_cust_one - 1], customerList[r_cust_two - 1],
+                                     currentSolutionRoutes[0],
+                                     distances, shapes, scale)
 
         else:
             # perform exchange operation
-            operation = exchange(customerList[r_cust_one - 1], customerList[r_cust_two - 1], currentSolutionRoutes[0],
-                                 distances, shape, scale)
+            operation = exchange_v2(customerList[r_cust_one - 1], customerList[r_cust_two - 1],
+                                    currentSolutionRoutes[0],
+                                    distances, shapes, scale)
 
         # I need to add to a candidate list neighborhood and operation id (either 1 or 2)
         candidate_list.append([operation, r_operation])
@@ -522,7 +629,7 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
     return candidate_list
 
 
-def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
+def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
     """
     Main tabu search execution procedure
 
@@ -535,9 +642,9 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
     """
 
     # to begin I need to specify all the required parameters
-    max_iter = 1000
-    no_impr_iter_max = 100
-    max_cand_list_len = 100
+    max_iter = 100
+    no_impr_iter_max = 20
+    max_cand_list_len = 50
     iteration = 0
     no_impr_iter = 0
 
@@ -563,7 +670,7 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shape, scale):
         # print("no impr ", no_impr_iter)
 
         # create a candidate list
-        candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shape, scale)
+        candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shapes, scale)
 
         # at this point I have a full candidate list. Next step is to check for the best elem in the tabu search or
         # gives better result than current best
