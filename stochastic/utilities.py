@@ -744,6 +744,37 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
     return [best_sol, iteration, no_impr_iter]
 
 
+def whole_route_shift(routePlan, scale):
+    ans = 0
+    # I start with the whole set of routes. Step 1 is to properly identify what and for how much I need to change.
+    # create a set of shifting values and divide them by the value of scale
+    # how about 5 min shifts up to 1 hour.
+
+    # keep in mind these number are in mins
+    set_shifts = np.arange(5 / scale, 60 / scale, 5 / scale)
+
+    # now for every route I need to compute the mean of arrival time without taking scale into account
+    # similar to the earliness computations
+
+    route_original_shapes = []
+
+    # every route
+    for elem in routePlan:
+
+        exp_arrival_shape = [0] * len(cust_ordering)
+
+        # compute all the expected shape of arrivals
+        for index, elem in enumerate(exp_arrival_shape):
+            if index == 0:
+                exp_arrival_shape[index] = to_cust_distances[index] * to_cust_shape[index]
+            else:
+                # I need to not just add a previous exp arrival time, but also the time to return
+                exp_arrival_shape[index] = exp_arrival_shape[index - 1] + to_cust_distances[index - 1] * to_cust_shape[
+                    index - 1] + to_cust_distances[index] * to_cust_shape[index]
+
+    return ans
+
+
 # extra initialization alg
 """
     # After having a list of customers and routes I need to create initial set of routes filed with customers.
