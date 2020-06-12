@@ -296,7 +296,6 @@ def earliness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     exp_arrival_shape = exp_arrival_shape[1:]
 
     for index, elem in enumerate(exp_arrival_shape, 1):
-        tmp = cust_ordering[index].getEarlyTW()
         earliness_elem = expected_earliness(elem, scale, cust_ordering[index].getEarlyTW())
         earliness[index] = earliness_elem
 
@@ -346,7 +345,6 @@ def lateness_array_v_2(cust_ordering, to_cust_distances, to_cust_shape, scale):
     exp_arrival_shape = exp_arrival_shape[1:]
 
     for index, elem in enumerate(exp_arrival_shape, 1):
-        tmp = cust_ordering[index].getLateTW()
         lateness_elem = expected_delay(elem, scale, cust_ordering[index].getLateTW())
         lateness[index] = lateness_elem
     # insert 0's because of the depot
@@ -744,33 +742,102 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
     return [best_sol, iteration, no_impr_iter]
 
 
-def whole_route_shift(routePlan, scale):
-    ans = 0
+def whole_route_shift(routePlan, scale, time_shift):
+    """
+
+        this function implements a whole route shifting to the right
+
+    :param routePlan: a set of routes to be shifted (footnote: final_ans[0][0])
+    :param scale: a scale param of gamma distribution
+    :param time_shift: how far we'd like to shift a route.
+    :return:
+    """
+
+    # deal with empty routes!!11
+
     # I start with the whole set of routes. Step 1 is to properly identify what and for how much I need to change.
     # create a set of shifting values and divide them by the value of scale
-    # how about 5 min shifts up to 1 hour.
 
     # keep in mind these number are in mins
-    set_shifts = np.arange(5 / scale, 60 / scale, 5 / scale)
+    shift = time_shift / scale
 
+    best_so_far_obj = 999999
     # now for every route I need to compute the mean of arrival time without taking scale into account
     # similar to the earliness computations
 
     route_original_shapes = []
+    cust_list_ids = []
+
+    obj_after_shift = []
+    shift_is = []
 
     # every route
-    for elem in routePlan:
+    for route in routePlan:
 
-        exp_arrival_shape = [0] * len(cust_ordering)
+        # create an empty list of shapes
+        exp_arrival_shape = [0] * len(route.distances)
 
         # compute all the expected shape of arrivals
         for index, elem in enumerate(exp_arrival_shape):
             if index == 0:
-                exp_arrival_shape[index] = to_cust_distances[index] * to_cust_shape[index]
+                exp_arrival_shape[index] = route.distances[index] * route.shapes[index]
             else:
                 # I need to not just add a previous exp arrival time, but also the time to return
-                exp_arrival_shape[index] = exp_arrival_shape[index - 1] + to_cust_distances[index - 1] * to_cust_shape[
-                    index - 1] + to_cust_distances[index] * to_cust_shape[index]
+                exp_arrival_shape[index] = exp_arrival_shape[index - 1] + route.distances[index - 1] * route.shapes[
+                    index - 1] + route.distances[index] * route.shapes[index]
+
+        # at this point I don't have a depot in my lists
+        # add all route shapes to a list
+        route_original_shapes.append(exp_arrival_shape[1:])
+        # I also need to store customers to get access to che corresp tws
+        cust_list_ids.append(route.currentRoute[1:])
+
+    # so I have a set of shapes and scale I need to do shiftings along with corresponding customer id's.
+    # I need to take every element (route) in route_original_shapes, add to inner elems the shift and compute
+    # the total value of the objective function. keep the best shift and obj function value
+
+    for counter, arrival_shapes in enumerate(route_original_shapes):
+        for i in range(0, 13, 1):
+            # shift exp arrival times
+            arrival_shapes_mod = [x + shift * i for x in arrival_shapes]
+
+            tmp = len(arrival_shapes_mod)
+
+            # compute the obj function values
+            earliness = [0] * len(arrival_shapes_mod)
+            lateness = [0] * len(arrival_shapes_mod)
+
+            for item in range(0, tmp):
+                earliness[item] = expected_earliness(arrival_shapes_mod[item], scale,
+                                                     cust_list_ids[counter][item].getEarlyTW())
+                lateness[item] = expected_delay(arrival_shapes_mod[item], scale,
+                                                cust_list_ids[counter][item].getLateTW())
+
+            # update the best place holder
+
+            tmp_obj = sum(earliness) + sum(lateness)
+
+            # update placeholder for the best obj function value and index of i (i.e. shift)
+            if tmp_obj < best_so_far_obj:
+                best_so_far_obj = tmp_obj
+                best_so_far_i = i
+
+        obj_after_shift.append(best_so_far_obj)
+        shift_is.append(best_so_far_i)
+        best_so_far_obj = 999
+
+    return obj_after_shift, shift_is
+
+
+def forward_shifting(routePlan, scale, time_shift):
+    # this function implements 1-by-1 individual shifting across all customers
+    '''
+    the approach is somewhat similar to the previous one. Instead of shifting all arrival times. I need to select a route,
+    and shift one by one and compute resulting best(if any). For the next one if shifting was implemented, this needs to
+    be recorded and for the next one the range of shiftings should be updated. Do for all
+
+    '''
+    ans = 0
 
     return ans
 

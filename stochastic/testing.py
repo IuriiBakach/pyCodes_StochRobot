@@ -90,15 +90,16 @@ for item in csv_list:
     # next is tabu search. namely 1-shift and exchange
     # run tabu search
 
-    final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
+    # final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
+
+    after_shift_obj, after_shift_ids = whole_route_shift(routePlan, los_matrix[0][0][1])
 
     # tabu search is all good. (coincides with previous computations)
     # now I need to design a waiting procedure
 
     # use distances and shapes for every route. to compute their product. then Think about how to shift things
     # I'd like to create 3 different post optimization approaches
-    # 1) whole plan shifting: for every route shift all arrival times by k*T and compute objective. select the one with
-    # the best improvement
+
     # 2) forward shifting: shift one - by-one. It is important to keep in mind the minimal possible shift for the
     # subsequent customers given the previous shift
     # 3) backward shifting: similar to forward but starting from the last customer
