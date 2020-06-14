@@ -115,12 +115,15 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
 
     # how do I compute the resulting shape? dist_outer*shape_outer+dist_inner*shape_inner/dist_outer+dist_inner
 
-    service_time = 1 / 30
+    # service time is 2 minutes or 1/30 hour
+    service_time = 2
 
     # setup a set of needed shape and scale parameters
     shape_zone_out = los_matrix[0][0][0]
     shape_zone_in = los_matrix[0][1][0]
     scale_par = los_matrix[0][0][1]
+
+    # I think I need to change the robot speed too
     robot_speed = 3
 
     # create an empty distance matrix and index matrix
@@ -138,7 +141,8 @@ def dist_matr_trim(distance_matrix_raw, los_matrix, cust_list):
         # go through every path
         for index, path in enumerate(elem):
             # compute an expected travel time of a path including service time
-            curr_path_time = ((path[0] * shape_zone_out + path[1] * shape_zone_in) / robot_speed) + service_time
+            '''I need to multiply by 60 in order to get to minutes conversion'''
+            curr_path_time = ((path[0] * shape_zone_out + path[1] * shape_zone_in) / robot_speed) * 60 + service_time
             # compute distance
             curr_path_distance = path[0] + path[1]
             # compute resulting shape coeff in the way it takes into account scale parameter too
@@ -961,6 +965,8 @@ def forward_shifting(routePlan, scale, time_shift):
 
     # recompute final obj value
     total_obj = 0
+    obj_e = 0
+    obj_l = 0
 
     for i, item in enumerate(exp_arrival_shape_after_shifts_per_routes):
         # elem is just an exp arrival time to a cust
@@ -975,9 +981,11 @@ def forward_shifting(routePlan, scale, time_shift):
                                          cust_list_ids[i][j].getLateTW())
 
         obj = sum(earliness) + sum(lateness)
+        obj_e += sum(earliness)
+        obj_l += sum(lateness)
         total_obj += obj
 
-    return by_cust_shift_per_route, total_obj
+    return by_cust_shift_per_route, total_obj, obj_e / total_obj, obj_l / total_obj
 
 
 # extra initialization alg
