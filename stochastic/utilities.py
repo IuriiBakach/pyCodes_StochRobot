@@ -753,8 +753,6 @@ def whole_route_shift(routePlan, scale, time_shift):
     :return:
     """
 
-    # deal with empty routes!!11
-
     # I start with the whole set of routes. Step 1 is to properly identify what and for how much I need to change.
     # create a set of shifting values and divide them by the value of scale
 
@@ -826,20 +824,160 @@ def whole_route_shift(routePlan, scale, time_shift):
         shift_is.append(best_so_far_i)
         best_so_far_obj = 999
 
-    return obj_after_shift, shift_is
+    return obj_after_shift, shift_is, sum(obj_after_shift)
 
 
 def forward_shifting(routePlan, scale, time_shift):
-    # this function implements 1-by-1 individual shifting across all customers
-    '''
-    the approach is somewhat similar to the previous one. Instead of shifting all arrival times. I need to select a route,
-    and shift one by one and compute resulting best(if any). For the next one if shifting was implemented, this needs to
-    be recorded and for the next one the range of shiftings should be updated. Do for all
+    # this function implements forward shifting across all customers
+    """
+    the approach is somewhat similar to the previous one. Instead of shifting all arrival times, take i-th customer and
+    check all possible shiftings. If there is a good one, use it and apply the same for all subsequent customers.
+    If objective is worse, reverse and move to the next customer. Repeat
 
-    '''
+    """
     ans = 0
 
-    return ans
+    # I start with the whole set of routes. Step 1 is to properly identify what and for how much I need to change.
+    # create a set of shifting values and divide them by the value of scale
+
+    shift_unit = time_shift / scale
+
+    # a set of shifting times (if shifting unit is 5min then a set is up to 1 hour)
+    shifting_set = [shift_unit * i for i in range(0, 13)]
+
+    best_so_far_obj = 999999
+    # now for every route I need to compute the mean of arrival time without taking scale into account
+    # similar to the earliness computations
+
+    route_original_shapes = []
+    cust_list_ids = []
+
+    # every route
+    for route in routePlan:
+
+        # create an empty list of shapes
+        exp_arrival_shape = [0] * len(route.distances)
+
+        # compute all the expected shape of arrivals
+        for index, elem in enumerate(exp_arrival_shape):
+            if index == 0:
+                exp_arrival_shape[index] = route.distances[index] * route.shapes[index]
+            else:
+                # I need to not just add a previous exp arrival time, but also the time to return
+                exp_arrival_shape[index] = exp_arrival_shape[index - 1] + route.distances[index - 1] * route.shapes[
+                    index - 1] + route.distances[index] * route.shapes[index]
+
+        # at this point I don't have a depot in my lists
+        # add all route shapes to a list
+        route_original_shapes.append(exp_arrival_shape[1:])
+        # I also need to store customers to get access to che corresp tws
+        cust_list_ids.append(route.currentRoute[1:])
+
+        # I have a list of original arrival shapes and a list of customer indices in all routes
+
+        # Now:
+        # for every element of original_shapes
+        # add shift and compute objective
+        # select the best one and modify all the shapes,
+        # move to the nex element (possibly use an index)
+
+        by_cust_shift = []
+        by_cust_shift_per_route = []
+        # for every route
+    for counter, arrival_shapes in enumerate(route_original_shapes):
+        # for every customer in that route
+        for i in range(0, len(arrival_shapes)):
+            # add a shift across all possible shifts to an arrival shapes
+
+            ''' possibly if shifting set is not empty '''
+            for shift_id, shift in enumerate(shifting_set):
+
+                shape_mod_tmp = arrival_shapes[i:]
+                shape_mod = [x + shift for x in shape_mod_tmp]
+
+                # after the shift is added I need to compute objective value
+
+                earliness = [0] * len(shape_mod)
+                lateness = [0] * len(shape_mod)
+
+                for item in range(0, len(shape_mod)):
+                    earliness[item] = expected_earliness(shape_mod[item], scale,
+                                                         cust_list_ids[counter][item + i].getEarlyTW())
+                    lateness[item] = expected_delay(shape_mod[item], scale,
+                                                    cust_list_ids[counter][item + i].getLateTW())
+
+                tmp_obj = sum(earliness) + sum(lateness)
+
+                # update placeholder for the best obj function value and index of i (i.e. shift)
+                if tmp_obj < best_so_far_obj:
+                    best_so_far_obj = tmp_obj
+                    best_so_far_shift = shift_id
+
+            # after the best shift for current customer is identified, apply that shift to all custs and move
+            # to the next customer
+
+            best_so_far_obj = 999999
+            by_cust_shift.append(best_so_far_shift)
+
+            ''' this needs to be updated'''
+            arrival_shapes_tmp = [x + shifting_set[best_so_far_shift] for x in arrival_shapes]
+            arrival_shapes = arrival_shapes_tmp
+
+            # and I need to update a set of possible shifts
+            # Now I am not sure I need to do it anymore
+            # shifting_set = shifting_set[best_so_far_shift:]
+
+        by_cust_shift_per_route.append(by_cust_shift)
+        by_cust_shift = []
+
+        # also need to get a final obj function recomputation after all shifts are complete
+        # in order to do this, I need to update all expected arrival times accordingly to shifts for all routes
+        # involved
+
+        inc_list_whole = []
+
+    # create a list of increments to be applied
+    for i, elem in enumerate(by_cust_shift_per_route):
+
+        inc_list_route = [0] * len(elem)
+
+        for j, item in enumerate(elem):
+            if j > 0:
+                inc_list_route[j] = item * time_shift + inc_list_route[j - 1]
+            else:
+                inc_list_route[j] = item * time_shift
+
+        inc_list_whole.append(inc_list_route)
+
+        # modify route arrival times
+
+    exp_arrival_shape_after_shifts_per_routes = []
+
+    for i, elem in enumerate(route_original_shapes):
+        exp_arrival_shape_after_shifts = [0] * len(elem)
+        for j, item in enumerate(elem):
+            exp_arrival_shape_after_shifts[j] = item + inc_list_whole[i][j]
+        exp_arrival_shape_after_shifts_per_routes.append(exp_arrival_shape_after_shifts)
+
+    # recompute final obj value
+    total_obj = 0
+
+    for i, item in enumerate(exp_arrival_shape_after_shifts_per_routes):
+        # elem is just an exp arrival time to a cust
+
+        earliness = [0] * len(item)
+        lateness = [0] * len(item)
+
+        for j, elem in enumerate(item):
+            earliness[j] = expected_earliness(elem, scale,
+                                              cust_list_ids[i][j].getEarlyTW())
+            lateness[j] = expected_delay(elem, scale,
+                                         cust_list_ids[i][j].getLateTW())
+
+        obj = sum(earliness) + sum(lateness)
+        total_obj += obj
+
+    return by_cust_shift_per_route, total_obj
 
 
 # extra initialization alg

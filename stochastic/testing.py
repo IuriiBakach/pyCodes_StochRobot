@@ -32,7 +32,7 @@ for item in csv_list:
     # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
     depot = Depot(0, 0, 0)
-    depot.setNumberOfRobots(2)
+    depot.setNumberOfRobots(3)
 
     # create a corresponding RoutePlan based on the number of robots in the depot
 
@@ -76,13 +76,13 @@ for item in csv_list:
     # add all customers
 
     routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
-    routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
     routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
 
-    routePlan[1].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
     routePlan[1].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
-    routePlan[1].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
     routePlan[1].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
 
     #    routePlan[0].remove_customer_v_2(2, los_matrix[0][0][1])
 
@@ -92,7 +92,11 @@ for item in csv_list:
 
     # final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
 
-    after_shift_obj, after_shift_ids = whole_route_shift(routePlan, los_matrix[0][0][1])
+    routePlan[0].total_lateness()
+
+    after_shift_obj, after_shift_ids, total_after_shift_obj = whole_route_shift(routePlan, los_matrix[0][0][1], .08333)
+
+    by_cust_shift_per_route, obj_value_after_fwd_shift = forward_shifting(routePlan, los_matrix[0][0][1], .08333)
 
     # tabu search is all good. (coincides with previous computations)
     # now I need to design a waiting procedure
