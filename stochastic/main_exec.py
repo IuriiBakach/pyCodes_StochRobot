@@ -12,20 +12,14 @@ robotSpeed = 3
 los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
 # _____parameters of the gamma distribution; order -> shape outer zone, shape inner zone
-los_matrix[0] = [(1, 1), (4, 1)]
+los_matrix[0] = [(1, 1), (2, 1)]
 # these are just stub values, potentially to update later
 
 print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
-# this approach works only with the case if I am not to touch scale which is bad and I need to rework it in the way
-# scale parameter can be varied and taken into account
-
-shapePar = 1
-scalePar = 1
-# create initial data: customers, depots, routes.
 
 # how about create a list with a set of csv files and then run the alg over all of them
-csv_list = ['1.csv', '2.csv']  # , '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
+csv_list = ['customers.csv']  # , '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
 
 for item in csv_list:
     # read in customers
@@ -38,7 +32,7 @@ for item in csv_list:
     # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
     depot = Depot(0, 0, 0)
-    depot.setNumberOfRobots(2)
+    depot.setNumberOfRobots(3)
 
     # create a corresponding RoutePlan based on the number of robots in the depot
 
@@ -115,30 +109,31 @@ for item in csv_list:
     print(routePlan[0])  
     '''
 
-    routePlan[0].insert_customer(1, custList[0], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[1], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[2], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[3], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[4], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[5], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[6], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[7], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[8], distances, shapePar, scalePar)
-    routePlan[0].insert_customer(1, custList[9], distances, shapePar, scalePar)
+    routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
 
-    routePlan[1].insert_customer(1, custList[10], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[11], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[12], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[13], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[14], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[15], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[16], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[17], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[18], distances, shapePar, scalePar)
-    routePlan[1].insert_customer(1, custList[19], distances, shapePar, scalePar)
+    routePlan[1].insert_customer_v_2(1, custList[7], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[8], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[9], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[10], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[11], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[12], distances, shapes, los_matrix[0][0][1])
+
+    routePlan[2].insert_customer_v_2(1, custList[13], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[14], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[15], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[16], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[17], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[18], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[19], distances, shapes, los_matrix[0][0][1])
 
     # need to run this tabu search
-    final_ans = tabu_search(custList_tabu, distances, routePlan, shapePar, scalePar)
+    final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
 
     # results outputs
     best_paths = best_paths[1:]
@@ -201,6 +196,16 @@ for item in csv_list:
 
     print("Total obj function is {:.6} ".format(final_ans[0][1]))
 
+    # evaluate shiftings
+    after_shift_obj, after_shift_ids, total_after_shift_obj = whole_route_shift(final_ans[0][0], los_matrix[0][0][1],
+                                                                                .08333)
+    print("Objective function after a whole route shift {:.6} ".format(total_after_shift_obj))
+
+    by_cust_shift_per_route, obj_value_after_fwd_shift = forward_shifting(final_ans[0][0], los_matrix[0][0][1], .08333)
+
+    print("Objective function after a forward shift shift {:.6} ".format(obj_value_after_fwd_shift))
+
+    print("Shifts used: ", by_cust_shift_per_route)
 # if __name__ == "__main__":
 #    main()
 

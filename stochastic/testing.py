@@ -19,7 +19,7 @@ print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0
 # create initial data: customers, depots, routes.
 
 # how about create a list with a set of csv files and then run the alg over all of them
-csv_list = ['customersTest.csv']  # , '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
+csv_list = ['customers.csv']  # , '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
 
 for item in csv_list:
     # read in customers
@@ -75,14 +75,37 @@ for item in csv_list:
 
     # add all customers
 
-    routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
-    routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
-    routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
+    # routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
+    # routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
+    # routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
 
-    routePlan[1].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
-    routePlan[1].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
-    routePlan[1].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
-    routePlan[1].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+    # routePlan[1].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
+    # routePlan[1].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
+    # routePlan[1].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
+    # routePlan[1].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+
+    routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[3], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[4], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[5], distances, shapes, los_matrix[0][0][1])
+    routePlan[0].insert_customer_v_2(1, custList[6], distances, shapes, los_matrix[0][0][1])
+
+    routePlan[1].insert_customer_v_2(1, custList[7], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[8], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[9], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[10], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[11], distances, shapes, los_matrix[0][0][1])
+    routePlan[1].insert_customer_v_2(1, custList[12], distances, shapes, los_matrix[0][0][1])
+
+    routePlan[2].insert_customer_v_2(1, custList[13], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[14], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[15], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[16], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[17], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[18], distances, shapes, los_matrix[0][0][1])
+    routePlan[2].insert_customer_v_2(1, custList[19], distances, shapes, los_matrix[0][0][1])
 
     #    routePlan[0].remove_customer_v_2(2, los_matrix[0][0][1])
 
@@ -90,20 +113,17 @@ for item in csv_list:
     # next is tabu search. namely 1-shift and exchange
     # run tabu search
 
-    # final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
+    final_ans = tabu_search(custList_tabu, distances, routePlan, shapes, los_matrix[0][0][1])
 
-    routePlan[0].total_lateness()
+    after_shift_obj, after_shift_ids, total_after_shift_obj = whole_route_shift(final_ans[0][0], los_matrix[0][0][1],
+                                                                                .08333)
 
-    after_shift_obj, after_shift_ids, total_after_shift_obj = whole_route_shift(routePlan, los_matrix[0][0][1], .08333)
+    by_cust_shift_per_route, obj_value_after_fwd_shift = forward_shifting(final_ans[0][0], los_matrix[0][0][1], .08333)
 
-    by_cust_shift_per_route, obj_value_after_fwd_shift = forward_shifting(routePlan, los_matrix[0][0][1], .08333)
+    print(final_ans[0][0][0].total_lateness() + final_ans[0][0][1].total_lateness() + final_ans[0][0][
+        0].total_earliness() + final_ans[0][0][
+              1].total_earliness() + final_ans[0][0][2].total_lateness() + final_ans[0][0][2].total_earliness())
 
-    # tabu search is all good. (coincides with previous computations)
-    # now I need to design a waiting procedure
+    print(total_after_shift_obj)
 
-    # use distances and shapes for every route. to compute their product. then Think about how to shift things
-    # I'd like to create 3 different post optimization approaches
-
-    # 2) forward shifting: shift one - by-one. It is important to keep in mind the minimal possible shift for the
-    # subsequent customers given the previous shift
-    # 3) backward shifting: similar to forward but starting from the last customer
+    print(obj_value_after_fwd_shift)
