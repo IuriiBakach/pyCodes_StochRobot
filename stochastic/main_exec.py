@@ -107,6 +107,45 @@ for item in csv_list:
     print(routePlan[0])  
     '''
 
+    # extra initialization alg
+
+    # After having a list of customers and routes I need to create initial set of routes filed with customers.
+    # Step 1: take empty routes. For all customers check all insertion positions based on the measures and insert
+    # those customers 1 by 1.
+
+    for i in range(0, len(custList)):
+        print(len(custList))
+        obj_fun_change = float("inf")
+
+        # for every customer and route
+        for customer in custList:
+            for route in routePlan:
+                # for every position
+                for position, elem in enumerate(route.currentRoute, 1):
+                    # compute measures before and after the customer is inserted
+                    prev_lateness = route.total_lateness()
+                    prev_earliness = route.total_earliness()
+                    route.insert_customer_v_2(position, customer, distances, shapes, los_matrix[0][0][1])
+                    curr_lateness = route.total_lateness()
+                    curr_earliness = route.total_earliness()
+                    # change in the earl\laten
+                    change_in_measures = curr_earliness - prev_earliness + curr_lateness - prev_lateness
+
+                    # update the insertion location if needed
+                    if change_in_measures < obj_fun_change:
+                        cust_to_ins = customer
+                        route_to_ins = route.id
+                        pos_to_ins = position
+                        # need to update upper bound on the measure to make sure it updates when needed, not always
+                        obj_fun_change = change_in_measures
+                    # once everything is computed and compared, restore the route
+                    route.remove_customer_v_2(position, los_matrix[0][0][1])
+
+        # after all customers and positions are checked finally insert a customer into a route
+        routePlan[route_to_ins].insert_customer_v_2(pos_to_ins, cust_to_ins, distances, shapes, los_matrix[0][0][1])
+        # and remove a customer from a list of initial customers
+        custList.remove(cust_to_ins)
+
     routePlan[0].insert_customer_v_2(1, custList[0], distances, shapes, los_matrix[0][0][1])
     routePlan[0].insert_customer_v_2(1, custList[1], distances, shapes, los_matrix[0][0][1])
     routePlan[0].insert_customer_v_2(1, custList[2], distances, shapes, los_matrix[0][0][1])
