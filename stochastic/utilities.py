@@ -521,7 +521,7 @@ def exchange_v2(cust1, cust2, route_plan, distMatr, shapes, scale):
     :param cust2: customer to relocate 2
     :param route_plan: an initial set of routes
     :param distMatr: matrix of distances form depot to customers
-    :param shape: shape parameter for gamma distribution
+    :param shapes: shape parameter for gamma distribution
     :param scale: scale parameter for gamma distribution
     :return: change in objective function after this operation
     """
@@ -590,7 +590,7 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
     :param currentSolutionRoutes: current solution
     :param max_cand_list_len: how many candidates to create
     :param distances: matrix of distance between customers
-    :param shape: list of shapes for best paths
+    :param shapes: list of shapes for best paths
     :param scale: scale
     :return: a sorted list of possible moves
     """
@@ -615,12 +615,26 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
             operation = one_shift_v2(customerList[r_cust_one - 1], customerList[r_cust_two - 1],
                                      currentSolutionRoutes[0],
                                      distances, shapes, scale)
+            # operation is [(cust1, cust2), total_earl + total_late, route_plan_copy]
+
+            # apparently I need to check the result of operation, run shifting here and record that result here
+            # create tmp var to get shiftings updates and rewrite operation afterwards
+
+            by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
+                operation[2], scale, 5)
+            operation[1] = tmp_obj_value_after_fwd_shift
 
         else:
             # perform exchange operation
             operation = exchange_v2(customerList[r_cust_one - 1], customerList[r_cust_two - 1],
                                     currentSolutionRoutes[0],
                                     distances, shapes, scale)
+
+            by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
+                operation[2], scale, 5)
+            operation[1] = tmp_obj_value_after_fwd_shift
+
+            # operation is [(cust1, cust2), total_earl + total_late, route_plan_copy]
 
         # I need to add to a candidate list neighborhood and operation id (either 1 or 2)
         candidate_list.append([operation, r_operation])
@@ -638,15 +652,15 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
     :param custList: initial list of customers
     :param matrOfDistances: matrix of distances between all customers
     :param listOfRoutes: initial list of routes to be modified
-    :param shape: shape parameter
+    :param shapes: shape parameter
     :param scale: scale parameter
     :return: best list of routes and a corresponding objective function
     """
 
     # to begin I need to specify all the required parameters
-    max_iter = 500
+    max_iter = 100
     no_impr_iter_max = 50
-    max_cand_list_len = 100
+    max_cand_list_len = 50
     iteration = 0
     no_impr_iter = 0
 
@@ -668,8 +682,8 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
 
     # start outer main while loop
     while iteration <= max_iter and no_impr_iter <= no_impr_iter_max:
-        # print("curr iter ", iteration)
-        # print("no impr ", no_impr_iter)
+        print("curr iter ", iteration)
+        print("no impr ", no_impr_iter)
 
         # create a candidate list
         candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shapes, scale)
