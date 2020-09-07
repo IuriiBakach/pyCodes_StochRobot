@@ -19,8 +19,8 @@ def main():
 
     # how about create a list with a set of csv files and then run the alg over all of them
     # csv_list = ['1.csv' , '2.csv', '3.csv', '4.csv', '5.csv', '6.csv', '7.csv', '8.csv', '9.csv', '10.csv']
-    csv_list = ['new_data_c_20_p_65_1.csv', 'new_data_c_20_p_65_2.csv', 'new_data_c_20_p_65_3.csv',
-                'new_data_c_20_p_65_4.csv', 'new_data_c_20_p_65_5.csv']
+    csv_list = ['new_data_c_20_p_65_1.csv']  # , 'new_data_c_20_p_65_2.csv', 'new_data_c_20_p_65_3.csv',
+    # 'new_data_c_20_p_65_4.csv', 'new_data_c_20_p_65_5.csv']
 
     for item in csv_list:
         # read in customers
@@ -33,7 +33,7 @@ def main():
         # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
         depot = Depot(0, 0, 0)
-        depot.setNumberOfRobots(4)
+        depot.setNumberOfRobots(5)
 
         # create a corresponding RoutePlan based on the number of robots in the depot
 
@@ -98,7 +98,7 @@ def main():
         # those customers 1 by 1.
 
         for i in range(0, len(custList)):
-            print(len(custList))
+            #print(len(custList))
             obj_fun_change = float("inf")
 
             # for every customer and route
