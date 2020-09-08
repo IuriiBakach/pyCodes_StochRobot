@@ -13,7 +13,7 @@ def main():
     los_matrix = np.zeros((1, 2), dtype='f,f').tolist()
 
     # _____parameters of the gamma distribution; order -> shape outer zone, shape inner zone
-    los_matrix[0] = [(1, 1), (1, 1)]
+    los_matrix[0] = [(1, 1), (4, 1)]
 
     print("Outer zone shape is {} and inner zone shape is {}".format(los_matrix[0][0][0], los_matrix[0][1][0]))
 
@@ -33,7 +33,7 @@ def main():
         # create depot with specified number of robots. Perhaps I don't really need a class-> dict would work
 
         depot = Depot(0, 0, 0)
-        depot.setNumberOfRobots(5)
+        depot.setNumberOfRobots(3)
 
         # create a corresponding RoutePlan based on the number of robots in the depot
 

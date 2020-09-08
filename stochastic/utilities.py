@@ -620,9 +620,9 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
             # apparently I need to check the result of operation, run shifting here and record that result here
             # create tmp var to get shiftings updates and rewrite operation afterwards
 
-            # by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
-            #    operation[2], scale, 5)
-            # operation[1] = tmp_obj_value_after_fwd_shift
+            by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
+                operation[2], scale, 5)
+            operation[1] = tmp_obj_value_after_fwd_shift
 
         else:
             # perform exchange operation
@@ -630,9 +630,9 @@ def create_cand_list(customerList, currentSolutionRoutes, max_cand_list_len, dis
                                     currentSolutionRoutes[0],
                                     distances, shapes, scale)
 
-            # by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
-            #    operation[2], scale, 5)
-            # operation[1] = tmp_obj_value_after_fwd_shift
+            by_cust_shift_per_route, tmp_obj_value_after_fwd_shift, percent_early, percent_late = forward_shifting(
+                operation[2], scale, 5)
+            operation[1] = tmp_obj_value_after_fwd_shift
 
             # operation is [(cust1, cust2), total_earl + total_late, route_plan_copy]
 
@@ -682,8 +682,8 @@ def tabu_search(custList, matrOfDistances, listOfRoutes, shapes, scale):
 
     # start outer main while loop
     while iteration <= max_iter and no_impr_iter <= no_impr_iter_max:
-        print("curr iter ", iteration)
-        print("no impr ", no_impr_iter)
+        # print("curr iter ", iteration)
+        # print("no impr ", no_impr_iter)
 
         # create a candidate list
         candidate_list = create_cand_list(custList, curr_sol, max_cand_list_len, matrOfDistances, shapes, scale)
